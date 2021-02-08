@@ -1,0 +1,27 @@
+version: "3"
+
+services:
+
+  mongodb:
+    image: mongo:latest
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin
+    ports:
+      - 27017:27017
+
+  fdk-sparql-service:
+    image: eu.gcr.io/digdir-fdk-infra/fdk-sparql-service:latest
+    volumes:
+      - /etc/fuseki/databases/
+    ports:
+      - "3030:8080"
+
+  rabbitmq:
+    image: rabbitmq:3.8.2-management
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=admin
+    ports:
+      - "5672:5672"
+      - "15672:15672"

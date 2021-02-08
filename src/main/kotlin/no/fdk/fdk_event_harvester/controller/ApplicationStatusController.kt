@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @CrossOrigin
-class ApplicationStatusController() {
+class ApplicationStatusController {
 
     @GetMapping("/ping")
     fun ping(): ResponseEntity<Void> =
