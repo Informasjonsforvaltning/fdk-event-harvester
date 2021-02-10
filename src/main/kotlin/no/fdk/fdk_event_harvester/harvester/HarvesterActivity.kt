@@ -8,9 +8,10 @@ import no.fdk.fdk_event_harvester.adapter.HarvestAdminAdapter
 import no.fdk.fdk_event_harvester.rabbit.RabbitMQPublisher
 import no.fdk.fdk_event_harvester.service.UpdateService
 import org.slf4j.LoggerFactory
+import org.springframework.boot.context.event.ApplicationReadyEvent
+import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Service
 import java.util.*
-import javax.annotation.PostConstruct
 
 private val LOGGER = LoggerFactory.getLogger(HarvesterActivity::class.java)
 private const val HARVEST_ALL_ID = "all"
@@ -23,8 +24,8 @@ class HarvesterActivity(
     private val updateService: UpdateService
 ): CoroutineScope by CoroutineScope(Dispatchers.Default) {
 
-    @PostConstruct
-    private fun fullHarvestOnStartup() = initiateHarvest(null)
+    @EventListener
+    fun fullHarvestOnStartup(event: ApplicationReadyEvent) = initiateHarvest(null)
 
     fun initiateHarvest(params: Map<String, String>?) {
         if (params == null || params.isEmpty()) LOGGER.debug("starting harvest of all events")
