@@ -1,10 +1,10 @@
 package no.fdk.fdk_event_harvester.service
 
 import no.fdk.fdk_event_harvester.model.TurtleDBO
-import no.fdk.fdk_event_harvester.rdf.JenaType
 import no.fdk.fdk_event_harvester.rdf.createRDFResponse
 import no.fdk.fdk_event_harvester.repository.TurtleRepository
 import org.apache.jena.rdf.model.Model
+import org.apache.jena.riot.Lang
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.io.ByteArrayOutputStream
@@ -49,13 +49,13 @@ class TurtleService(private val turtleRepository: TurtleRepository) {
 private fun Model.createUnionTurtleDBO(): TurtleDBO =
     TurtleDBO(
         id = UNION_ID,
-        turtle = gzip(createRDFResponse(JenaType.TURTLE))
+        turtle = gzip(createRDFResponse(Lang.TURTLE))
     )
 
 private fun Model.createEventTurtleDBO(fdkId: String, withRecords: Boolean): TurtleDBO =
     TurtleDBO(
         id = turtleId(fdkId, withRecords),
-        turtle = gzip(createRDFResponse(JenaType.TURTLE))
+        turtle = gzip(createRDFResponse(Lang.TURTLE))
     )
 
 fun turtleId(fdkId: String, withRecords: Boolean): String =
@@ -64,7 +64,7 @@ fun turtleId(fdkId: String, withRecords: Boolean): String =
 private fun Model.createHarvestSourceTurtleDBO(uri: String): TurtleDBO =
     TurtleDBO(
         id = uri,
-        turtle = gzip(createRDFResponse(JenaType.TURTLE))
+        turtle = gzip(createRDFResponse(Lang.TURTLE))
     )
 
 fun gzip(content: String): String {

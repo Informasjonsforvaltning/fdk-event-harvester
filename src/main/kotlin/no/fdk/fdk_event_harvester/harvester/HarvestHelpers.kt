@@ -2,7 +2,6 @@ package no.fdk.fdk_event_harvester.harvester
 
 import no.fdk.fdk_event_harvester.rdf.CPSV
 import no.fdk.fdk_event_harvester.rdf.CV
-import no.fdk.fdk_event_harvester.rdf.JenaType
 import no.fdk.fdk_event_harvester.rdf.parseRDFResponse
 import org.apache.jena.query.QueryExecutionFactory
 import org.apache.jena.query.QueryFactory
@@ -10,12 +9,13 @@ import org.apache.jena.rdf.model.Model
 import org.apache.jena.rdf.model.Resource
 import org.apache.jena.rdf.model.ResourceRequiredException
 import org.apache.jena.rdf.model.Statement
+import org.apache.jena.riot.Lang
 import org.apache.jena.vocabulary.RDF
 import java.util.*
 
 fun EventRDFModel.harvestDiff(dboNoRecords: String?): Boolean =
     if (dboNoRecords == null) true
-    else !harvested.isIsomorphicWith(parseRDFResponse(dboNoRecords, JenaType.TURTLE, null))
+    else !harvested.isIsomorphicWith(parseRDFResponse(dboNoRecords, Lang.TURTLE, null))
 
 fun splitEventsFromRDF(harvested: Model): List<EventRDFModel> {
     val businessEvents = harvested.listResourcesWithProperty(RDF.type, CV.BusinessEvent)

@@ -2,8 +2,8 @@ package no.fdk.fdk_event_harvester.service
 
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
-import no.fdk.fdk_event_harvester.rdf.JenaType
 import no.fdk.fdk_event_harvester.utils.*
+import org.apache.jena.riot.Lang
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
@@ -27,8 +27,8 @@ class EventServiceTest {
 
             val expected = responseReader.parseResponse("", "TURTLE")
 
-            val responseTurtle = service.getAll(JenaType.TURTLE)
-            val responseJsonLD = service.getAll(JenaType.JSON_LD)
+            val responseTurtle = service.getAll(Lang.TURTLE)
+            val responseJsonLD = service.getAll(Lang.JSONLD)
 
             assertTrue(expected.isIsomorphicWith(responseReader.parseResponse(responseTurtle, "TURTLE")))
             assertTrue(expected.isIsomorphicWith(responseReader.parseResponse(responseJsonLD, "JSON-LD")))
@@ -43,9 +43,9 @@ class EventServiceTest {
 
             val expected = responseReader.parseFile("all_events.ttl", "TURTLE")
 
-            val responseTurtle = service.getAll(JenaType.TURTLE)
-            val responseN3 = service.getAll(JenaType.N3)
-            val responseNTriples = service.getAll(JenaType.NTRIPLES)
+            val responseTurtle = service.getAll(Lang.TURTLE)
+            val responseN3 = service.getAll(Lang.N3)
+            val responseNTriples = service.getAll(Lang.NTRIPLES)
 
             assertTrue(expected.isIsomorphicWith(responseReader.parseResponse(responseTurtle, "TURTLE")))
             assertTrue(expected.isIsomorphicWith(responseReader.parseResponse(responseN3, "N3")))
@@ -62,7 +62,7 @@ class EventServiceTest {
             whenever(turtleService.getEvent("123", true))
                 .thenReturn(null)
 
-            val response = service.getEventById("123", JenaType.TURTLE)
+            val response = service.getEventById("123", Lang.TURTLE)
 
             assertNull(response)
         }
@@ -73,8 +73,8 @@ class EventServiceTest {
             whenever(turtleService.getEvent(EVENT_ID_0, true))
                 .thenReturn(event)
 
-            val responseTurtle = service.getEventById(EVENT_ID_0, JenaType.TURTLE)
-            val responseRDFXML = service.getEventById(EVENT_ID_0, JenaType.RDF_XML)
+            val responseTurtle = service.getEventById(EVENT_ID_0, Lang.TURTLE)
+            val responseRDFXML = service.getEventById(EVENT_ID_0, Lang.RDFXML)
 
             val expected = responseReader.parseFile("event_0.ttl", "TURTLE")
 

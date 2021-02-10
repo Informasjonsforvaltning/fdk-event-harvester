@@ -8,6 +8,7 @@ import no.fdk.fdk_event_harvester.repository.*
 import no.fdk.fdk_event_harvester.service.*
 import org.apache.jena.rdf.model.Model
 import org.apache.jena.rdf.model.ModelFactory
+import org.apache.jena.riot.Lang
 import org.apache.jena.sparql.vocabulary.FOAF
 import org.apache.jena.vocabulary.DCAT
 import org.apache.jena.vocabulary.DCTerms
@@ -34,13 +35,13 @@ class EventHarvester(
 
             val harvested = when (jenaWriterType) {
                 null -> null
-                JenaType.NOT_JENA -> null
+                Lang.RDFNULL -> null
                 else -> adapter.getEvents(source)?.let { parseRDFResponse(it, jenaWriterType, sourceURL) }
             }
 
             when {
                 jenaWriterType == null -> LOGGER.error("Not able to harvest from $sourceURL, no accept header supplied")
-                jenaWriterType == JenaType.NOT_JENA -> LOGGER.error("Not able to harvest from $sourceURL, header ${source.acceptHeaderValue} is not acceptable ")
+                jenaWriterType == Lang.RDFNULL -> LOGGER.error("Not able to harvest from $sourceURL, header ${source.acceptHeaderValue} is not acceptable ")
                 harvested == null -> LOGGER.info("Not able to harvest $sourceURL")
                 else -> updateIfHarvestedContainsChanges(harvested, sourceURL, harvestDate)
             }
@@ -48,7 +49,7 @@ class EventHarvester(
 
     private fun updateIfHarvestedContainsChanges(harvested: Model, sourceURL: String, harvestDate: Calendar) {
         val dbData = turtleService.getHarvestSource(sourceURL)
-            ?.let { parseRDFResponse(it, JenaType.TURTLE, null) }
+            ?.let { parseRDFResponse(it, Lang.TURTLE, null) }
 
         if (dbData != null && harvested.isIsomorphicWith(dbData)) {
             LOGGER.info("No changes from last harvest of $sourceURL")

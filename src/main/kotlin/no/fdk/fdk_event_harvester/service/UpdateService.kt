@@ -4,11 +4,11 @@ import no.fdk.fdk_event_harvester.adapter.FusekiAdapter
 import no.fdk.fdk_event_harvester.configuration.ApplicationProperties
 import no.fdk.fdk_event_harvester.harvester.calendarFromTimestamp
 import no.fdk.fdk_event_harvester.model.*
-import no.fdk.fdk_event_harvester.rdf.JenaType
 import no.fdk.fdk_event_harvester.rdf.parseRDFResponse
 import no.fdk.fdk_event_harvester.repository.*
 import org.apache.jena.rdf.model.Model
 import org.apache.jena.rdf.model.ModelFactory
+import org.apache.jena.riot.Lang
 import org.apache.jena.sparql.vocabulary.FOAF
 import org.apache.jena.vocabulary.DCAT
 import org.apache.jena.vocabulary.DCTerms
@@ -29,7 +29,7 @@ class UpdateService (
         eventMetaRepository.findAll()
             .forEach {
                 turtleService.getEvent(it.fdkId, withRecords = true)
-                    ?.let { dboTurtle -> parseRDFResponse(dboTurtle, JenaType.TURTLE, null) }
+                    ?.let { dboTurtle -> parseRDFResponse(dboTurtle, Lang.TURTLE, null) }
                     ?.run { unionModel = unionModel.union(this) }
             }
 
@@ -45,7 +45,7 @@ class UpdateService (
                 val catalogMeta = event.createMetaModel()
 
                 turtleService.getEvent(event.fdkId, withRecords = false)
-                    ?.let { eventNoRecords -> parseRDFResponse(eventNoRecords, JenaType.TURTLE, null) }
+                    ?.let { eventNoRecords -> parseRDFResponse(eventNoRecords, Lang.TURTLE, null) }
                     ?.let { eventModelNoRecords -> catalogMeta.union(eventModelNoRecords) }
                     ?.run { turtleService.saveAsEvent(this, event.fdkId, withRecords = true) }
             }

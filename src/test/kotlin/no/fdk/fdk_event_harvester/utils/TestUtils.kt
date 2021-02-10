@@ -4,10 +4,10 @@ import com.mongodb.ConnectionString
 import com.mongodb.MongoClientSettings
 import com.mongodb.client.MongoClient
 import com.mongodb.client.MongoClients
-import no.fdk.fdk_event_harvester.rdf.JenaType
 import no.fdk.fdk_event_harvester.rdf.createRDFResponse
 import no.fdk.fdk_event_harvester.utils.ApiTestContext.Companion.mongoContainer
 import org.apache.jena.rdf.model.Model
+import org.apache.jena.riot.Lang
 import org.bson.codecs.configuration.CodecRegistries
 import org.bson.codecs.pojo.PojoCodecProvider
 import org.slf4j.LoggerFactory
@@ -103,8 +103,8 @@ fun checkIfIsomorphicAndPrintDiff(actual: Model, expected: Model, name: String):
     val isIsomorphic = actual.isIsomorphicWith(expected)
 
     if (!isIsomorphic) {
-        val actualDiff = actual.difference(expected).createRDFResponse(JenaType.TURTLE)
-        val expectedDiff = expected.difference(actual).createRDFResponse(JenaType.TURTLE)
+        val actualDiff = actual.difference(expected).createRDFResponse(Lang.TURTLE)
+        val expectedDiff = expected.difference(actual).createRDFResponse(Lang.TURTLE)
 
         if (actualDiff.isNotEmpty()) {
             logger.error("non expected nodes in $name:")

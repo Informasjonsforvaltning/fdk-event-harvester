@@ -1,8 +1,8 @@
 package no.fdk.fdk_event_harvester.controller
 
-import no.fdk.fdk_event_harvester.rdf.JenaType
 import no.fdk.fdk_event_harvester.rdf.jenaTypeFromAcceptHeader
 import no.fdk.fdk_event_harvester.service.EventService
+import org.apache.jena.riot.Lang
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
@@ -22,9 +22,9 @@ open class EventsController(private val eventService: EventService) {
         LOGGER.info("get Event with id $id")
         val returnType = jenaTypeFromAcceptHeader(accept)
 
-        return if (returnType == JenaType.NOT_JENA) ResponseEntity(HttpStatus.NOT_ACCEPTABLE)
+        return if (returnType == Lang.RDFNULL) ResponseEntity(HttpStatus.NOT_ACCEPTABLE)
         else {
-            eventService.getEventById(id, returnType ?: JenaType.TURTLE)
+            eventService.getEventById(id, returnType ?: Lang.TURTLE)
                 ?.let { ResponseEntity(it, HttpStatus.OK) }
                 ?: ResponseEntity(HttpStatus.NOT_FOUND)
         }
@@ -35,8 +35,8 @@ open class EventsController(private val eventService: EventService) {
         LOGGER.info("get all events")
         val returnType = jenaTypeFromAcceptHeader(accept)
 
-        return if (returnType == JenaType.NOT_JENA) ResponseEntity(HttpStatus.NOT_ACCEPTABLE)
-        else ResponseEntity(eventService.getAll(returnType ?: JenaType.TURTLE), HttpStatus.OK)
+        return if (returnType == Lang.RDFNULL) ResponseEntity(HttpStatus.NOT_ACCEPTABLE)
+        else ResponseEntity(eventService.getAll(returnType ?: Lang.TURTLE), HttpStatus.OK)
     }
 
 }
