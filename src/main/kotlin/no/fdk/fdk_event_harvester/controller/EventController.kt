@@ -4,11 +4,11 @@ import no.fdk.fdk_event_harvester.rdf.JenaType
 import no.fdk.fdk_event_harvester.rdf.jenaTypeFromAcceptHeader
 import no.fdk.fdk_event_harvester.service.EventService
 import org.slf4j.LoggerFactory
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.*
-import javax.servlet.http.HttpServletRequest
 
 private val LOGGER = LoggerFactory.getLogger(EventsController::class.java)
 
@@ -17,10 +17,10 @@ private val LOGGER = LoggerFactory.getLogger(EventsController::class.java)
 @RequestMapping(value = ["/events"], produces = ["text/turtle", "text/n3", "application/rdf+json", "application/ld+json", "application/rdf+xml", "application/n-triples"])
 open class EventsController(private val eventService: EventService) {
 
-    @GetMapping(value = ["/{id}"])
-    fun getEventById(httpServletRequest: HttpServletRequest, @PathVariable id: String): ResponseEntity<String> {
+    @GetMapping("/{id}")
+    fun getEventById(@RequestHeader(HttpHeaders.ACCEPT) accept: String?, @PathVariable id: String): ResponseEntity<String> {
         LOGGER.info("get Event with id $id")
-        val returnType = jenaTypeFromAcceptHeader(httpServletRequest.getHeader("Accept"))
+        val returnType = jenaTypeFromAcceptHeader(accept)
 
         return if (returnType == JenaType.NOT_JENA) ResponseEntity(HttpStatus.NOT_ACCEPTABLE)
         else {
@@ -30,10 +30,10 @@ open class EventsController(private val eventService: EventService) {
         }
     }
 
-    @GetMapping()
-    fun getCatalogs(httpServletRequest: HttpServletRequest): ResponseEntity<String> {
+    @GetMapping
+    fun getCatalogs(@RequestHeader(HttpHeaders.ACCEPT) accept: String?): ResponseEntity<String> {
         LOGGER.info("get all events")
-        val returnType = jenaTypeFromAcceptHeader(httpServletRequest.getHeader("Accept"))
+        val returnType = jenaTypeFromAcceptHeader(accept)
 
         return if (returnType == JenaType.NOT_JENA) ResponseEntity(HttpStatus.NOT_ACCEPTABLE)
         else ResponseEntity(eventService.getAll(returnType ?: JenaType.TURTLE), HttpStatus.OK)

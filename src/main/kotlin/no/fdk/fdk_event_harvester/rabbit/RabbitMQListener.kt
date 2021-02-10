@@ -27,9 +27,7 @@ class RabbitMQListener(
     fun receiveServicesHarvestTrigger(@Payload body: JsonNode?, message: Message) {
         logger.info("Received message with key ${message.messageProperties.receivedRoutingKey}")
 
-        val params: Map<String, String> = createQueryParams(body)
-
-        harvesterActivity.initiateHarvest(params)
+        harvesterActivity.initiateHarvest(createQueryParams(body))
     }
 
 }

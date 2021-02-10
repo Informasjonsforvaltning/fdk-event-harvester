@@ -33,13 +33,12 @@ class HarvesterActivity(
         val harvest = launch {
             harvestAdminAdapter.getDataSources(params)
                 .filter { it.dataType == "publicService" }
+                .filter { it.url != null }
                 .forEach {
-                    if (it.url != null) {
-                        try {
-                            harvester.harvestEvents(it, Calendar.getInstance())
-                        } catch (exception: Exception) {
-                            LOGGER.error("Harvest of ${it.url} failed", exception)
-                        }
+                    try {
+                        harvester.harvestEvents(it, Calendar.getInstance())
+                    } catch (exception: Exception) {
+                        LOGGER.error("Harvest of ${it.url} failed", exception)
                     }
                 }
         }

@@ -17,7 +17,7 @@ private val logger = LoggerFactory.getLogger(HarvestAdminAdapter::class.java)
 class HarvestAdminAdapter(private val applicationProperties: ApplicationProperties) {
 
     fun urlWithParameters(params: Map<String, String>?): URL =
-        if (params != null && params.isNotEmpty()) {
+        if (!params.isNullOrEmpty()) {
             URL("${applicationProperties.harvestAdminRootUrl}/datasources?${
                 params.map { "${it.key}=${it.value}" }.joinToString("&")
             }")
@@ -27,8 +27,8 @@ class HarvestAdminAdapter(private val applicationProperties: ApplicationProperti
         val url = urlWithParameters(queryParams)
         try {
             with(url.openConnection() as HttpURLConnection) {
-                setRequestProperty("Accept", MediaType.APPLICATION_JSON.toString())
-                setRequestProperty("Content-type", MediaType.APPLICATION_JSON.toString())
+                setRequestProperty(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON.toString())
+                setRequestProperty(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON.toString())
 
                 if (HttpStatus.valueOf(responseCode).is2xxSuccessful) {
                     val body = inputStream.bufferedReader().use(BufferedReader::readText)

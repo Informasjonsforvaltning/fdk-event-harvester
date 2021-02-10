@@ -28,23 +28,23 @@ class EventHarvester(
 ) {
 
     fun harvestEvents(source: HarvestDataSource, harvestDate: Calendar) =
-        if (source.url != null) {
-            LOGGER.debug("Starting harvest of ${source.url}")
+        source.url?.let { sourceURL ->
+            LOGGER.debug("Starting harvest of $sourceURL")
             val jenaWriterType = jenaTypeFromAcceptHeader(source.acceptHeaderValue)
 
             val harvested = when (jenaWriterType) {
                 null -> null
                 JenaType.NOT_JENA -> null
-                else -> adapter.getEvents(source)?.let { parseRDFResponse(it, jenaWriterType, source.url) }
+                else -> adapter.getEvents(source)?.let { parseRDFResponse(it, jenaWriterType, sourceURL) }
             }
 
             when {
-                jenaWriterType == null -> LOGGER.error("Not able to harvest from ${source.url}, no accept header supplied")
-                jenaWriterType == JenaType.NOT_JENA -> LOGGER.error("Not able to harvest from ${source.url}, header ${source.acceptHeaderValue} is not acceptable ")
-                harvested == null -> LOGGER.info("Not able to harvest ${source.url}")
-                else -> updateIfHarvestedContainsChanges(harvested, source.url, harvestDate)
+                jenaWriterType == null -> LOGGER.error("Not able to harvest from $sourceURL, no accept header supplied")
+                jenaWriterType == JenaType.NOT_JENA -> LOGGER.error("Not able to harvest from $sourceURL, header ${source.acceptHeaderValue} is not acceptable ")
+                harvested == null -> LOGGER.info("Not able to harvest $sourceURL")
+                else -> updateIfHarvestedContainsChanges(harvested, sourceURL, harvestDate)
             }
-        } else LOGGER.error("Harvest source is not defined")
+        } ?: LOGGER.error("Harvest source is not defined")
 
     private fun updateIfHarvestedContainsChanges(harvested: Model, sourceURL: String, harvestDate: Calendar) {
         val dbData = turtleService.getHarvestSource(sourceURL)
