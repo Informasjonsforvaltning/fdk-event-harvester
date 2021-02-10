@@ -25,8 +25,8 @@ class HarvestAdminAdapter(private val applicationProperties: ApplicationProperti
 
     fun getDataSources(queryParams: Map<String, String>?): List<HarvestDataSource> {
         val url = urlWithParameters(queryParams)
-        try {
-            with(url.openConnection() as HttpURLConnection) {
+        with(url.openConnection() as HttpURLConnection) {
+            try {
                 setRequestProperty(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON.toString())
                 setRequestProperty(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON.toString())
 
@@ -36,11 +36,13 @@ class HarvestAdminAdapter(private val applicationProperties: ApplicationProperti
                 } else {
                     logger.error("Fetch of harvest urls from $url failed, status: $responseCode")
                 }
+            } catch (ex: Exception) {
+                logger.error("Error fetching harvest urls from $url", ex)
+            } finally {
+                disconnect()
             }
-        } catch (ex: Exception) {
-            logger.error("Error fetching harvest urls from $url", ex)
+            return emptyList()
         }
-        return emptyList()
     }
 
 }

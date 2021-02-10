@@ -13,12 +13,12 @@ private val LOGGER = LoggerFactory.getLogger(EventAdapter::class.java)
 @Service
 class EventAdapter {
 
-    fun getEvents(source: HarvestDataSource): String? =
+    fun getEvents(source: HarvestDataSource): String? {
+        val connection = URL(source.url).openConnection() as HttpURLConnection
         try {
-            val connection = URL(source.url).openConnection() as HttpURLConnection
             connection.setRequestProperty("Accept", source.acceptHeaderValue)
 
-            if (connection.responseCode != HttpStatus.OK.value()) {
+            return if (connection.responseCode != HttpStatus.OK.value()) {
                 LOGGER.error("${source.url} responded with ${connection.responseCode}, harvest will be aborted")
                 null
             } else {
@@ -30,7 +30,10 @@ class EventAdapter {
 
         } catch (ex: Exception) {
             LOGGER.error("Error when harvesting from ${source.url}", ex)
-            null
+            return null
+        } finally {
+            connection.disconnect()
         }
+    }
 
 }
