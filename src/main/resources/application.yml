@@ -1,0 +1,48 @@
+logging:
+  level.root: WARN
+  level.no: ${LOG_LEVEL:DEBUG}
+  level.org.springframework: WARN
+  level.org.springframework.web: WARN
+  level.org.apache.jena: ERROR
+server:
+  port: 8080
+spring:
+  rabbitmq:
+    host: rabbitmq
+    port: 5672
+    username: ${RABBIT_USERNAME}
+    password: ${RABBIT_PASSWORD}
+  data.mongodb.uri: mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@mongodb:27017/eventHarvester?authSource=admin&authMechanism=SCRAM-SHA-1
+application:
+  eventsUri: ${FDK_BASE_URI:https://staging.fellesdatakatalog.digdir.no}/events
+  harvestAdminRootUrl: ${HARVEST_ADMIN_ROOT_URL:http://fdk-harvest-admin:8080/api}
+  fdkApiKey: fdk-api-key
+fuseki.unionGraphUri: ${FDK_SPARQL_SERVICE_URI:http://fdk-sparql-service:808}/fuseki/harvested?graph=https://data.norge.no/events
+---
+spring:
+  config.activate.on-profile: develop
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: admin
+    password: admin
+  data.mongodb.uri: mongodb://admin:admin@localhost:27017/eventHarvester?authSource=admin&authMechanism=SCRAM-SHA-1
+application:
+  eventsUri: https://staging.fellesdatakatalog.digdir.no/events
+  harvestAdminRootUrl: https://admin-api.staging.fellesdatakatalog.digdir.no/api
+  fdkApiKey: fdk-api-key
+fuseki.unionGraphUri: http://localhost:3030/fuseki/harvested?graph=https://data.norge.no/events
+---
+spring:
+  config.activate.on-profile: contract-test
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: admin
+    password: admin
+  data.mongodb.uri: mongodb://admin:admin@localhost:27017/eventHarvester?authSource=admin&authMechanism=SCRAM-SHA-1
+application:
+  eventsUri: http://localhost:5000/events
+  harvestAdminRootUrl: http://localhost:5000/api
+  fdkApiKey: fdk-api-key
+fuseki.unionGraphUri: http://localhost:5000/fuseki/harvested?graph=https://data.norge.no/events
