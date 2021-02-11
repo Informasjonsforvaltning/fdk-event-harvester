@@ -47,11 +47,13 @@ fun apiGet(port: Int, endpoint: String, acceptHeader: String?): Map<String,Any> 
     }
 }
 
-fun apiPost(port: Int, endpoint: String, headers: Map<String, String>): Map<String,Any> {
+fun authorizedPost(port: Int, endpoint: String, token: String?, headers: Map<String, String>): Map<String,Any> {
 
     return try {
         val connection = URL("http://localhost:$port$endpoint").openConnection() as HttpURLConnection
         headers.forEach { (key, value) -> connection.setRequestProperty(key, value) }
+        if(!token.isNullOrEmpty()) connection.setRequestProperty("Authorization", "Bearer $token")
+
         connection.requestMethod = "POST"
         connection.connect()
 

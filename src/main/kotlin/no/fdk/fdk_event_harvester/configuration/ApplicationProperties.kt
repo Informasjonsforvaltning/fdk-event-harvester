@@ -7,6 +7,5 @@ import org.springframework.boot.context.properties.ConstructorBinding
 @ConfigurationProperties("application")
 data class ApplicationProperties(
     val eventsUri: String,
-    val harvestAdminRootUrl: String,
-    val fdkApiKey: String
+    val harvestAdminRootUrl: String
 )
