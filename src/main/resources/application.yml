@@ -7,6 +7,9 @@ logging:
 server:
   port: 8080
 spring:
+  security.oauth2.resourceserver.jwt:
+    jwk-set-uri: ${SSO_HOST:https://sso.staging.fellesdatakatalog.digdir.no}/auth/realms/fdk/protocol/openid-connect/certs
+    issuer-uri: ${SSO_HOST:https://sso.staging.fellesdatakatalog.digdir.no}/auth/realms/fdk
   rabbitmq:
     host: rabbitmq
     port: 5672
@@ -16,7 +19,6 @@ spring:
 application:
   eventsUri: ${FDK_BASE_URI:https://staging.fellesdatakatalog.digdir.no}/events
   harvestAdminRootUrl: ${HARVEST_ADMIN_ROOT_URL:http://fdk-harvest-admin:8080/api}
-  fdkApiKey: fdk-api-key
 fuseki.unionGraphUri: ${FDK_SPARQL_SERVICE_URI:http://fdk-sparql-service:808}/fuseki/harvested?graph=https://data.norge.no/events
 ---
 spring:
@@ -30,11 +32,13 @@ spring:
 application:
   eventsUri: https://staging.fellesdatakatalog.digdir.no/events
   harvestAdminRootUrl: https://admin-api.staging.fellesdatakatalog.digdir.no/api
-  fdkApiKey: fdk-api-key
 fuseki.unionGraphUri: http://localhost:3030/fuseki/harvested?graph=https://data.norge.no/events
 ---
 spring:
   config.activate.on-profile: contract-test
+  security.oauth2.resourceserver.jwt:
+    jwk-set-uri: http://localhost:5000/auth/realms/fdk/protocol/openid-connect/certs
+    issuer-uri: http://localhost:5000/auth/realms/fdk
   rabbitmq:
     host: 127.0.0.1
     port: 5672
@@ -44,5 +48,4 @@ spring:
 application:
   eventsUri: http://localhost:5000/events
   harvestAdminRootUrl: http://localhost:5000/api
-  fdkApiKey: fdk-api-key
 fuseki.unionGraphUri: http://localhost:5000/fuseki/harvested?graph=https://data.norge.no/events

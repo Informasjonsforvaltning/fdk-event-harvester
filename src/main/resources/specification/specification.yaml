@@ -88,6 +88,8 @@ paths:
           description: Dataset catalog with requested id does not exist
   '/update/meta':
     post:
+      security:
+        - bearerAuth: [ ]
       tags:
         - events
       description: Updates stored turtle files with current meta data for events
@@ -95,5 +97,12 @@ paths:
       responses:
         '204':
           description: No Content
-        '403':
-          description: Forbidden
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+security:
+  - bearerAuth: [ ]
