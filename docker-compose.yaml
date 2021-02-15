@@ -12,6 +12,8 @@ services:
 
   fdk-sparql-service:
     image: eu.gcr.io/digdir-fdk-infra/fdk-sparql-service:latest
+    volumes:
+      - /store/app/store
     ports:
       - "3030:8080"
 
