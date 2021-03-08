@@ -16,7 +16,7 @@ import org.apache.jena.vocabulary.RDF
 import org.springframework.stereotype.Service
 
 @Service
-class UpdateService (
+class UpdateService(
     private val applicationProperties: ApplicationProperties,
     private val fusekiAdapter: FusekiAdapter,
     private val eventMetaRepository: EventMetaRepository,
@@ -25,23 +25,28 @@ class UpdateService (
 
     fun updateUnionModel() {
         var unionModel = ModelFactory.createDefaultModel()
+        var unionModelNoRecords = ModelFactory.createDefaultModel()
 
         eventMetaRepository.findAll()
             .forEach {
                 turtleService.getEvent(it.fdkId, withRecords = true)
                     ?.let { dboTurtle -> parseRDFResponse(dboTurtle, Lang.TURTLE, null) }
                     ?.run { unionModel = unionModel.union(this) }
+
+                turtleService.getEvent(it.fdkId, withRecords = false)
+                    ?.let { dboTurtle -> parseRDFResponse(dboTurtle, Lang.TURTLE, null) }
+                    ?.run { unionModelNoRecords = unionModelNoRecords.union(this) }
             }
 
         fusekiAdapter.storeUnionModel(unionModel)
 
-        turtleService.saveAsUnion(unionModel)
+        turtleService.saveAsUnion(unionModel, true)
+        turtleService.saveAsUnion(unionModelNoRecords, false)
     }
 
     fun updateMetaData() {
         eventMetaRepository.findAll()
             .forEach { event ->
-                val fdkURI = "${applicationProperties.eventsUri}/${event.fdkId}"
                 val catalogMeta = event.createMetaModel()
 
                 turtleService.getEvent(event.fdkId, withRecords = false)
