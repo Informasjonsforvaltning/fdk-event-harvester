@@ -4,6 +4,7 @@ import no.fdk.fdk_event_harvester.model.EventMeta
 import no.fdk.fdk_event_harvester.model.TurtleDBO
 import no.fdk.fdk_event_harvester.service.UNION_ID
 import no.fdk.fdk_event_harvester.service.gzip
+import no.fdk.fdk_event_harvester.service.turtleId
 import org.bson.Document
 
 private val responseReader = TestResponseReader()
@@ -18,8 +19,14 @@ val EVENT_META_0 = EventMeta(
 
 
 val EVENT_TURTLE_0 = TurtleDBO(
-    id = EVENT_ID_0,
+    id = turtleId(EVENT_ID_0, true),
     turtle = gzip(responseReader.readFile("event_0.ttl"))
+)
+
+
+val EVENT_TURTLE_0_NO_RECORDS = TurtleDBO(
+    id = turtleId(EVENT_ID_0, false),
+    turtle = gzip(responseReader.readFile("no_records_event_0.ttl"))
 )
 
 
@@ -30,10 +37,14 @@ val EVENT_META_1 = EventMeta(
     modified = TEST_HARVEST_DATE.timeInMillis
 )
 
-
 val EVENT_TURTLE_1 = TurtleDBO(
-    id = EVENT_ID_1,
+    id = turtleId(EVENT_ID_1, true),
     turtle = gzip(responseReader.readFile("event_1.ttl"))
+)
+
+val EVENT_TURTLE_1_NO_RECORDS = TurtleDBO(
+    id = turtleId(EVENT_ID_1, false),
+    turtle = gzip(responseReader.readFile("no_records_event_1.ttl"))
 )
 
 val HARVESTED_DBO = TurtleDBO(
@@ -42,12 +53,20 @@ val HARVESTED_DBO = TurtleDBO(
 )
 
 val UNION_DATA = TurtleDBO(
-    id = UNION_ID,
+    id = turtleId(UNION_ID, true),
     turtle = gzip(responseReader.readFile("all_events.ttl"))
 )
 
+val UNION_DATA_NO_RECORDS = TurtleDBO(
+    id = turtleId(UNION_ID, false),
+    turtle = gzip(responseReader.readFile("no_records_all_events.ttl"))
+)
+
 fun turtlePopulation(): List<Document> =
-    listOf(UNION_DATA, HARVESTED_DBO, EVENT_TURTLE_0, EVENT_TURTLE_1)
+    listOf(
+        UNION_DATA, HARVESTED_DBO, EVENT_TURTLE_0, EVENT_TURTLE_1,
+        EVENT_TURTLE_0_NO_RECORDS, EVENT_TURTLE_1_NO_RECORDS, UNION_DATA_NO_RECORDS
+    )
         .map { it.mapDBO() }
 
 fun eventPopulation(): List<Document> =

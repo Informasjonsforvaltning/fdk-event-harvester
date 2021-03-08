@@ -20,11 +20,11 @@ const val UNION_ID = "event-union-graph"
 @Service
 class TurtleService(private val turtleRepository: TurtleRepository) {
 
-    fun saveAsUnion(model: Model) =
-        turtleRepository.save(model.createUnionTurtleDBO())
+    fun saveAsUnion(model: Model, withRecords: Boolean) =
+        turtleRepository.save(model.createUnionTurtleDBO(withRecords))
 
-    fun getUnion(): String? =
-        turtleRepository.findByIdOrNull(UNION_ID)
+    fun getUnion(withRecords: Boolean): String? =
+        turtleRepository.findByIdOrNull(turtleId(UNION_ID, withRecords))
             ?.turtle
             ?.let { ungzip(it) }
 
@@ -46,9 +46,9 @@ class TurtleService(private val turtleRepository: TurtleRepository) {
 
 }
 
-private fun Model.createUnionTurtleDBO(): TurtleDBO =
+private fun Model.createUnionTurtleDBO(withRecords: Boolean): TurtleDBO =
     TurtleDBO(
-        id = UNION_ID,
+        id = turtleId(UNION_ID, withRecords),
         turtle = gzip(createRDFResponse(Lang.TURTLE))
     )
 

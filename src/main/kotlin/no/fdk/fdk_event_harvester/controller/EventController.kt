@@ -14,29 +14,39 @@ private val LOGGER = LoggerFactory.getLogger(EventsController::class.java)
 
 @Controller
 @CrossOrigin
-@RequestMapping(value = ["/events"], produces = ["text/turtle", "text/n3", "application/rdf+json", "application/ld+json", "application/rdf+xml", "application/n-triples"])
+@RequestMapping(
+    value = ["/events"],
+    produces = ["text/turtle", "text/n3", "application/rdf+json", "application/ld+json", "application/rdf+xml", "application/n-triples"]
+)
 open class EventsController(private val eventService: EventService) {
 
     @GetMapping("/{id}")
-    fun getEventById(@RequestHeader(HttpHeaders.ACCEPT) accept: String?, @PathVariable id: String): ResponseEntity<String> {
+    fun getEventById(
+        @RequestHeader(HttpHeaders.ACCEPT) accept: String?,
+        @PathVariable id: String,
+        @RequestParam(value = "catalogrecords", required = false) catalogRecords: Boolean = false
+    ): ResponseEntity<String> {
         LOGGER.info("get Event with id $id")
         val returnType = jenaTypeFromAcceptHeader(accept)
 
         return if (returnType == Lang.RDFNULL) ResponseEntity(HttpStatus.NOT_ACCEPTABLE)
         else {
-            eventService.getEventById(id, returnType ?: Lang.TURTLE)
+            eventService.getEventById(id, returnType ?: Lang.TURTLE, catalogRecords)
                 ?.let { ResponseEntity(it, HttpStatus.OK) }
                 ?: ResponseEntity(HttpStatus.NOT_FOUND)
         }
     }
 
     @GetMapping
-    fun getCatalogs(@RequestHeader(HttpHeaders.ACCEPT) accept: String?): ResponseEntity<String> {
+    fun getCatalogs(
+        @RequestHeader(HttpHeaders.ACCEPT) accept: String?,
+        @RequestParam(value = "catalogrecords", required = false) catalogRecords: Boolean = false
+    ): ResponseEntity<String> {
         LOGGER.info("get all events")
         val returnType = jenaTypeFromAcceptHeader(accept)
 
         return if (returnType == Lang.RDFNULL) ResponseEntity(HttpStatus.NOT_ACCEPTABLE)
-        else ResponseEntity(eventService.getAll(returnType ?: Lang.TURTLE), HttpStatus.OK)
+        else ResponseEntity(eventService.getAll(returnType ?: Lang.TURTLE, catalogRecords), HttpStatus.OK)
     }
 
 }

@@ -59,23 +59,32 @@ class UpdateServiceTest {
         fun updateUnionModel() {
             whenever(metaRepository.findAll())
                 .thenReturn(listOf(EVENT_META_0, EVENT_META_1))
+
             whenever(turtleService.getEvent(EVENT_ID_0, true))
                 .thenReturn(responseReader.readFile("event_0.ttl"))
             whenever(turtleService.getEvent(EVENT_ID_1, true))
                 .thenReturn(responseReader.readFile("event_1.ttl"))
 
+            whenever(turtleService.getEvent(EVENT_ID_0, false))
+                .thenReturn(responseReader.readFile("no_records_event_0.ttl"))
+            whenever(turtleService.getEvent(EVENT_ID_1, false))
+                .thenReturn(responseReader.readFile("no_records_event_1.ttl"))
+
             updateService.updateUnionModel()
 
             val expected = responseReader.parseFile("all_events.ttl", "TURTLE")
+            val expectedNoRecords = responseReader.parseFile("no_records_all_events.ttl", "TURTLE")
 
             argumentCaptor<Model>().apply {
                 verify(fusekiAdapter, times(1)).storeUnionModel(capture())
                 assertTrue(checkIfIsomorphicAndPrintDiff(firstValue, expected, "updateUnionModel-fuseki"))
             }
 
-            argumentCaptor<Model>().apply {
-                verify(turtleService, times(1)).saveAsUnion(capture())
-                assertTrue(checkIfIsomorphicAndPrintDiff(firstValue, expected, "updateUnionModel-mongo"))
+            argumentCaptor<Model, Boolean>().apply {
+                verify(turtleService, times(2)).saveAsUnion(first.capture(), second.capture())
+                assertTrue(checkIfIsomorphicAndPrintDiff(first.firstValue, expected, "updateUnionModel-witchrecords"))
+                assertTrue(checkIfIsomorphicAndPrintDiff(first.secondValue, expectedNoRecords, "updateUnionModel-norecords"))
+                assertEquals(listOf(true, false), second.allValues)
             }
         }
     }
