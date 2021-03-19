@@ -1,6 +1,5 @@
 package no.fdk.fdk_event_harvester.service
 
-import no.fdk.fdk_event_harvester.adapter.FusekiAdapter
 import no.fdk.fdk_event_harvester.configuration.ApplicationProperties
 import no.fdk.fdk_event_harvester.harvester.calendarFromTimestamp
 import no.fdk.fdk_event_harvester.model.*
@@ -18,7 +17,6 @@ import org.springframework.stereotype.Service
 @Service
 class UpdateService(
     private val applicationProperties: ApplicationProperties,
-    private val fusekiAdapter: FusekiAdapter,
     private val eventMetaRepository: EventMetaRepository,
     private val turtleService: TurtleService
 ) {
@@ -37,8 +35,6 @@ class UpdateService(
                     ?.let { dboTurtle -> parseRDFResponse(dboTurtle, Lang.TURTLE, null) }
                     ?.run { unionModelNoRecords = unionModelNoRecords.union(this) }
             }
-
-        fusekiAdapter.storeUnionModel(unionModel)
 
         turtleService.saveAsUnion(unionModel, true)
         turtleService.saveAsUnion(unionModelNoRecords, false)

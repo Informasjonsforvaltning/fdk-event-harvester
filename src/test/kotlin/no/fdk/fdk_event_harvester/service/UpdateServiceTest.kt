@@ -1,7 +1,6 @@
 package no.fdk.fdk_event_harvester.service
 
 import com.nhaarman.mockitokotlin2.*
-import no.fdk.fdk_event_harvester.adapter.FusekiAdapter
 import no.fdk.fdk_event_harvester.configuration.ApplicationProperties
 import no.fdk.fdk_event_harvester.repository.EventMetaRepository
 import no.fdk.fdk_event_harvester.utils.*
@@ -16,9 +15,8 @@ import org.junit.jupiter.api.Test
 class UpdateServiceTest {
     private val metaRepository: EventMetaRepository = mock()
     private val valuesMock: ApplicationProperties = mock()
-    private val fusekiAdapter: FusekiAdapter = mock()
     private val turtleService: TurtleService = mock()
-    private val updateService = UpdateService(valuesMock, fusekiAdapter, metaRepository, turtleService)
+    private val updateService = UpdateService(valuesMock, metaRepository, turtleService)
 
     private val responseReader = TestResponseReader()
 
@@ -74,11 +72,6 @@ class UpdateServiceTest {
 
             val expected = responseReader.parseFile("all_events.ttl", "TURTLE")
             val expectedNoRecords = responseReader.parseFile("no_records_all_events.ttl", "TURTLE")
-
-            argumentCaptor<Model>().apply {
-                verify(fusekiAdapter, times(1)).storeUnionModel(capture())
-                assertTrue(checkIfIsomorphicAndPrintDiff(firstValue, expected, "updateUnionModel-fuseki"))
-            }
 
             argumentCaptor<Model, Boolean>().apply {
                 verify(turtleService, times(2)).saveAsUnion(first.capture(), second.capture())
