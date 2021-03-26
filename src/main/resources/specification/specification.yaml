@@ -16,10 +16,6 @@ tags:
 servers:
   - url: 'https://events.fellesdatakatalog.digdir.no'
     description: Produksjonsmiljø
-  - url: 'https://events.staging.fellesdatakatalog.digdir.no'
-    description: Testmiljø
-  - url: 'https://events.demo.fellesdatakatalog.digdir.no'
-    description: Demomiljø
 paths:
   /events:
     get:
