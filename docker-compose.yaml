@@ -10,13 +10,6 @@ services:
     ports:
       - 27017:27017
 
-  fdk-sparql-service:
-    image: eu.gcr.io/digdir-fdk-infra/fdk-sparql-service:latest
-    volumes:
-      - /store/app/store
-    ports:
-      - "3030:8080"
-
   rabbitmq:
     image: rabbitmq:3.8.2-management
     environment:

@@ -19,7 +19,6 @@ spring:
 application:
   eventsUri: ${FDK_BASE_URI:https://staging.fellesdatakatalog.digdir.no}/events
   harvestAdminRootUrl: ${HARVEST_ADMIN_ROOT_URL:http://fdk-harvest-admin:8080/api}
-fuseki.unionGraphUri: ${FDK_SPARQL_SERVICE_URI:http://fdk-sparql-service:808}/fuseki/harvested?graph=https://data.norge.no/events
 ---
 spring:
   config.activate.on-profile: develop
@@ -32,7 +31,6 @@ spring:
 application:
   eventsUri: https://staging.fellesdatakatalog.digdir.no/events
   harvestAdminRootUrl: https://admin-api.staging.fellesdatakatalog.digdir.no/api
-fuseki.unionGraphUri: http://localhost:3030/fuseki/harvested?graph=https://data.norge.no/events
 ---
 spring:
   config.activate.on-profile: contract-test
@@ -48,4 +46,3 @@ spring:
 application:
   eventsUri: http://localhost:5000/events
   harvestAdminRootUrl: http://localhost:5000/api
-fuseki.unionGraphUri: http://localhost:5000/fuseki/harvested?graph=https://data.norge.no/events
