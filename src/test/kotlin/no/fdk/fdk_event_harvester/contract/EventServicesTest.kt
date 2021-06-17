@@ -1,6 +1,7 @@
 package no.fdk.fdk_event_harvester.contract
 
 import no.fdk.fdk_event_harvester.utils.*
+import org.apache.jena.riot.Lang
 import org.junit.jupiter.api.*
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.web.server.LocalServerPort
@@ -34,11 +35,11 @@ class EventServicesTest: ApiTestContext() {
 
     @Test
     fun findAllNoRecords() {
-        val response = apiGet(port, "/events", "text/turtle")
+        val response = apiGet(port, "/events", "application/trig")
         Assumptions.assumeTrue(HttpStatus.OK.value() == response["status"])
 
         val expected = responseReader.parseFile("no_records_all_events.ttl", "TURTLE")
-        val responseModel = responseReader.parseResponse(response["body"] as String, "TURTLE")
+        val responseModel = responseReader.parseResponse(response["body"] as String, Lang.TRIG.name)
 
         assertTrue(checkIfIsomorphicAndPrintDiff(actual = responseModel, expected = expected, name = "ServicesTest.findAll"))
     }
@@ -56,11 +57,11 @@ class EventServicesTest: ApiTestContext() {
 
     @Test
     fun findSpecificNoRecords() {
-        val response = apiGet(port, "/events/$EVENT_ID_0", "application/rdf+json")
+        val response = apiGet(port, "/events/$EVENT_ID_0", "application/trix")
         Assumptions.assumeTrue(HttpStatus.OK.value() == response["status"])
 
         val expected = responseReader.parseFile("no_records_event_0.ttl", "TURTLE")
-        val responseModel = responseReader.parseResponse(response["body"] as String, "RDF/JSON")
+        val responseModel = responseReader.parseResponse(response["body"] as String, Lang.TRIX.name)
 
         assertTrue(checkIfIsomorphicAndPrintDiff(actual = responseModel, expected = expected, name = "ServicesTest.findSpecific"))
     }

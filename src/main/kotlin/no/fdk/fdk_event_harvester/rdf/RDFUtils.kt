@@ -15,12 +15,15 @@ const val BACKUP_BASE_URI = "http://example.com/"
 fun jenaTypeFromAcceptHeader(accept: String?): Lang? =
     when {
         accept == null -> null
-        accept.contains("text/turtle") -> Lang.TURTLE
-        accept.contains("application/rdf+xml") -> Lang.RDFXML
-        accept.contains("application/rdf+json") -> Lang.RDFJSON
-        accept.contains("application/ld+json") -> Lang.JSONLD
-        accept.contains("application/n-triples") -> Lang.NTRIPLES
+        accept.contains(Lang.TURTLE.headerString) -> Lang.TURTLE
         accept.contains("text/n3") -> Lang.N3
+        accept.contains(Lang.TRIG.headerString) -> Lang.TRIG
+        accept.contains(Lang.RDFXML.headerString) -> Lang.RDFXML
+        accept.contains(Lang.RDFJSON.headerString) -> Lang.RDFJSON
+        accept.contains(Lang.JSONLD.headerString) -> Lang.JSONLD
+        accept.contains(Lang.NTRIPLES.headerString) -> Lang.NTRIPLES
+        accept.contains(Lang.NQUADS.headerString) -> Lang.NQUADS
+        accept.contains(Lang.TRIX.headerString) -> Lang.TRIX
         accept.contains("*/*") -> null
         else -> Lang.RDFNULL
     }
