@@ -19,7 +19,7 @@ class EventAdapter {
             connection.setRequestProperty("Accept", source.acceptHeaderValue)
 
             return if (connection.responseCode != HttpStatus.OK.value()) {
-                LOGGER.error("${source.url} responded with ${connection.responseCode}, harvest will be aborted")
+                LOGGER.error(Exception("${source.url} responded with ${connection.responseCode}, harvest will be aborted").stackTraceToString())
                 null
             } else {
                 connection
@@ -29,7 +29,7 @@ class EventAdapter {
             }
 
         } catch (ex: Exception) {
-            LOGGER.error("Error when harvesting from ${source.url}", ex)
+            LOGGER.error("${ex.stackTraceToString()}: Error when harvesting from ${source.url}")
             return null
         } finally {
             connection.disconnect()

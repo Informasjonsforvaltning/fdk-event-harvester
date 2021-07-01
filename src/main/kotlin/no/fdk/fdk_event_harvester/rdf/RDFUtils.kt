@@ -34,7 +34,7 @@ fun parseRDFResponse(responseBody: String, rdfLanguage: Lang, rdfSource: String?
     try {
         responseModel.read(StringReader(responseBody), BACKUP_BASE_URI, rdfLanguage.name)
     } catch (ex: Exception) {
-        logger.error("Parse from $rdfSource has failed: ${ex.message}")
+        logger.error("${ex.stackTraceToString()}: Parse from $rdfSource has failed")
         return null
     }
 

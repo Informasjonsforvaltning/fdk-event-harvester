@@ -34,10 +34,10 @@ class HarvestAdminAdapter(private val applicationProperties: ApplicationProperti
                     val body = inputStream.bufferedReader().use(BufferedReader::readText)
                     return jacksonObjectMapper().readValue(body)
                 } else {
-                    logger.error("Fetch of harvest urls from $url failed, status: $responseCode")
+                    logger.error(Exception("Fetch of harvest urls from $url failed, status: $responseCode").stackTraceToString())
                 }
             } catch (ex: Exception) {
-                logger.error("Error fetching harvest urls from $url", ex)
+                logger.error("${ex.stackTraceToString()}: Error fetching harvest urls from $url")
             } finally {
                 disconnect()
             }
