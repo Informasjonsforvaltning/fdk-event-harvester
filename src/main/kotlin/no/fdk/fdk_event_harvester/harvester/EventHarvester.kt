@@ -40,12 +40,12 @@ class EventHarvester(
             }
 
             when {
-                jenaWriterType == null -> LOGGER.error(Exception("Not able to harvest from $sourceURL, no accept header supplied").stackTraceToString())
-                jenaWriterType == Lang.RDFNULL -> LOGGER.error(Exception("Not able to harvest from $sourceURL, header ${source.acceptHeaderValue} is not acceptable").stackTraceToString())
+                jenaWriterType == null -> LOGGER.error("Not able to harvest from $sourceURL, no accept header supplied", HarvestException(sourceURL))
+                jenaWriterType == Lang.RDFNULL -> LOGGER.error("Not able to harvest from $sourceURL, header ${source.acceptHeaderValue} is not acceptable", HarvestException(sourceURL))
                 harvested == null -> LOGGER.info("Not able to harvest $sourceURL")
                 else -> updateIfHarvestedContainsChanges(harvested, sourceURL, harvestDate)
             }
-        } ?: LOGGER.error(Exception("Harvest source is not defined").stackTraceToString())
+        } ?: LOGGER.error("Harvest source is not defined", HarvestException("undefined"))
 
     private fun updateIfHarvestedContainsChanges(harvested: Model, sourceURL: String, harvestDate: Calendar) {
         val dbData = turtleService.getHarvestSource(sourceURL)
@@ -59,7 +59,7 @@ class EventHarvester(
 
             val events = splitEventsFromRDF(harvested)
 
-            if (events.isEmpty()) LOGGER.error(Exception("No events found in data harvested from $sourceURL").stackTraceToString())
+            if (events.isEmpty()) LOGGER.error("No events found in data harvested from $sourceURL", HarvestException(sourceURL))
             else updateDB(events, harvestDate)
         }
     }

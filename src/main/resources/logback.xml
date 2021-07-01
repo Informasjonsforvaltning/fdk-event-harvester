@@ -21,7 +21,7 @@
                 </logLevel>
                 <message/>
                 <pattern>
-                    <pattern>{ "serviceContext": { "service": "fdk-event-harvester" } }</pattern>
+                    <pattern>{ "message": "%exception%message", "serviceContext": { "service": "fdk-event-harvester" } }</pattern>
                 </pattern>
             </providers>
         </encoder>
