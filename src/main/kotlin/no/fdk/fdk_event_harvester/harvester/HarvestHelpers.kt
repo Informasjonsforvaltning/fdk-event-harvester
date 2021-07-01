@@ -99,3 +99,5 @@ private fun Model.containsTriple(subj: String, pred: String, obj: String): Boole
     val query = QueryFactory.create(askQuery)
     return QueryExecutionFactory.create(query, this).execAsk()
 }
+
+class HarvestException(url: String) : Exception("Harvest failed for $url")
