@@ -2,6 +2,7 @@ name: Deploy to staging
 
 on:
   pull_request:
+    types: [ready_for_review, opened, reopened, synchronize]
     branches:
       - main
 
@@ -9,23 +10,24 @@ jobs:
   build-and-deploy:
     name: Deploy to staging environment when pull request is created
     runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
 
     steps:
       - uses: actions/checkout@v2
 
-      # Setup java jdk
-      - uses: actions/setup-java@v1
+      - name: Setup java jdk
+        uses: actions/setup-java@v1
         with:
           java-version: '15'
 
-      # Setup gcloud CLI
-      - uses: google-github-actions/setup-gcloud@master
+      - name: Setup gcloud CLI
+        uses: google-github-actions/setup-gcloud@master
         with:
           service_account_email: ${{ secrets.GCP_SA_DIGDIR_FDK_GCR_EMAIL }}
           service_account_key: ${{ secrets.GCP_SA_DIGDIR_FDK_GCR_KEY }}
 
-      # Configure docker to use the gcloud command-line tool as a credential helper
-      - run: gcloud auth configure-docker eu.gcr.io
+      - name: Configure docker to use the gcloud command-line tool as a credential helper
+        run: gcloud auth configure-docker eu.gcr.io
 
       - name: Package & run tests with maven
         run: mvn clean install --no-transfer-progress
