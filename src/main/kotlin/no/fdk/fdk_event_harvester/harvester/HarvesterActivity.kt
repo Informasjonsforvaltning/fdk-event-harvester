@@ -4,6 +4,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
 import no.fdk.fdk_event_harvester.adapter.HarvestAdminAdapter
 import no.fdk.fdk_event_harvester.rabbit.RabbitMQPublisher
 import no.fdk.fdk_event_harvester.service.UpdateService
@@ -24,6 +26,9 @@ class HarvesterActivity(
     private val updateService: UpdateService
 ): CoroutineScope by CoroutineScope(Dispatchers.Default) {
 
+    private val activitySemaphore = Semaphore(1)
+    private val harvestSemaphore = Semaphore(5)
+
     @EventListener
     fun fullHarvestOnStartup(event: ApplicationReadyEvent) = initiateHarvest(null)
 
@@ -32,20 +37,25 @@ class HarvesterActivity(
         else LOGGER.debug("starting harvest with parameters $params")
 
         val harvest = launch {
-            harvestAdminAdapter.getDataSources(params)
-                .filter { it.dataType == "publicService" }
-                .filter { it.url != null }
-                .forEach {
-                    try {
-                        harvester.harvestEvents(it, Calendar.getInstance())
-                    } catch (exception: Exception) {
-                        LOGGER.error("Harvest of ${it.url} failed", exception)
+            activitySemaphore.withPermit {
+                harvestAdminAdapter.getDataSources(params)
+                    .filter { it.dataType == "publicService" }
+                    .filter { it.url != null }
+                    .forEach {
+                        launch {
+                            harvestSemaphore.withPermit {
+                                try {
+                                    harvester.harvestEvents(it, Calendar.getInstance())
+                                } catch (exception: Exception) {
+                                    LOGGER.error("Harvest of ${it.url} failed", exception)
+                                }
+                            }
+                        }
                     }
-                }
+            }
         }
 
-        val onHarvestCompletion = launch {
-            harvest.join()
+        harvest.invokeOnCompletion {
             LOGGER.debug("Updating union model")
             updateService.updateUnionModel()
 
@@ -53,11 +63,6 @@ class HarvesterActivity(
             else LOGGER.debug("completed harvest with parameters $params")
 
             publisher.send(HARVEST_ALL_ID)
-
-            harvest.cancelChildren()
-            harvest.cancel()
         }
-
-        onHarvestCompletion.invokeOnCompletion { onHarvestCompletion.cancel() }
     }
 }
