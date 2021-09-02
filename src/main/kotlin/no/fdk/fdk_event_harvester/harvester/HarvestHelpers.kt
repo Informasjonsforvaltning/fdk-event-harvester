@@ -96,8 +96,10 @@ private fun Model.resourceShouldBeAdded(resource: Resource): Boolean {
 private fun Model.containsTriple(subj: String, pred: String, obj: String): Boolean {
     val askQuery = "ASK { $subj $pred $obj }"
 
-    val query = QueryFactory.create(askQuery)
-    return QueryExecutionFactory.create(query, this).execAsk()
+    return try {
+        val query = QueryFactory.create(askQuery)
+        return QueryExecutionFactory.create(query, this).execAsk()
+    } catch (ex: Exception) { false }
 }
 
 class HarvestException(url: String) : Exception("Harvest failed for $url")
