@@ -39,6 +39,16 @@
   cv:hasCompetentAuthority <https://data.brreg.no/enhetsregisteret/api/enheter/983887457> ;
 .
 
+[ a cv:LifeEvent ;
+  dct:identifier "filtered-life" ;
+  dct:title "Filtered LifeEvent"@en
+] .
+
+[ a cv:BusinessEvent ;
+  dct:identifier "filtered-business" ;
+  dct:title "Filtered BusinessEvent"@en
+] .
+
 <https://data.norge.no/concepts/300> a skos:Concept ;
   skos:prefLabel "Starte og drive en bedrift"@nb, "Starting business"@en ;
 .

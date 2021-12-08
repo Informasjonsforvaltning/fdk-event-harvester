@@ -57,7 +57,7 @@ class EventHarvester(
             LOGGER.info("Changes detected, saving data from $sourceURL, and updating FDK meta data")
             turtleService.saveAsHarvestSource(harvested, sourceURL)
 
-            val events = splitEventsFromRDF(harvested)
+            val events = splitEventsFromRDF(harvested, sourceURL)
 
             if (events.isEmpty()) LOGGER.error("No events found in data harvested from $sourceURL", HarvestException(sourceURL))
             else updateDB(events, harvestDate)
