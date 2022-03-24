@@ -18,7 +18,7 @@ spring:
   data.mongodb.uri: mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@mongodb:27017/eventHarvester?authSource=admin&authMechanism=SCRAM-SHA-1
 application:
   eventsUri: ${FDK_BASE_URI:https://staging.fellesdatakatalog.digdir.no}/events
-  harvestAdminRootUrl: ${HARVEST_ADMIN_ROOT_URL:http://fdk-harvest-admin:8080/api}
+  harvestAdminRootUrl: ${HARVEST_ADMIN_ROOT_URL:http://new-harvest-admin:8080}
 management:
   endpoints:
     web:
@@ -44,7 +44,7 @@ spring:
   data.mongodb.uri: mongodb://admin:admin@localhost:27017/eventHarvester?authSource=admin&authMechanism=SCRAM-SHA-1
 application:
   eventsUri: https://staging.fellesdatakatalog.digdir.no/events
-  harvestAdminRootUrl: https://admin-api.staging.fellesdatakatalog.digdir.no/api
+  harvestAdminRootUrl: https://new-admin.staging.fellesdatakatalog.digdir.no
 ---
 spring:
   config.activate.on-profile: contract-test
@@ -59,4 +59,4 @@ spring:
   data.mongodb.uri: mongodb://admin:admin@localhost:27017/eventHarvester?authSource=admin&authMechanism=SCRAM-SHA-1
 application:
   eventsUri: http://localhost:5000/events
-  harvestAdminRootUrl: http://localhost:5000/api
+  harvestAdminRootUrl: http://localhost:5000
