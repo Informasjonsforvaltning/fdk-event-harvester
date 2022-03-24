@@ -7,6 +7,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import no.fdk.fdk_event_harvester.adapter.HarvestAdminAdapter
+import no.fdk.fdk_event_harvester.model.HarvestAdminParameters
 import no.fdk.fdk_event_harvester.rabbit.RabbitMQPublisher
 import no.fdk.fdk_event_harvester.service.UpdateService
 import org.slf4j.LoggerFactory
@@ -32,13 +33,13 @@ class HarvesterActivity(
     @EventListener
     fun fullHarvestOnStartup(event: ApplicationReadyEvent) = initiateHarvest(null)
 
-    fun initiateHarvest(params: Map<String, String>?) {
-        if (params == null || params.isEmpty()) LOGGER.debug("starting harvest of all events")
+    fun initiateHarvest(params: HarvestAdminParameters?) {
+        if (params == null) LOGGER.debug("starting harvest of all events")
         else LOGGER.debug("starting harvest with parameters $params")
 
         val harvest = launch {
             activitySemaphore.withPermit {
-                harvestAdminAdapter.getDataSources(params)
+                harvestAdminAdapter.getDataSources(params ?: HarvestAdminParameters())
                     .filter { it.dataType == "publicService" }
                     .filter { it.url != null }
                     .forEach {
@@ -59,7 +60,7 @@ class HarvesterActivity(
             LOGGER.debug("Updating union model")
             updateService.updateUnionModel()
 
-            if (params == null || params.isEmpty()) LOGGER.debug("completed harvest of all events")
+            if (params == null) LOGGER.debug("completed harvest of all events")
             else LOGGER.debug("completed harvest with parameters $params")
 
             publisher.send(HARVEST_ALL_ID)
