@@ -50,21 +50,6 @@ class HarvestAdminAdapterTest {
         }
 
         @Test
-        fun publisherIdAndDataSourceId() {
-            whenever(valuesMock.harvestAdminRootUrl)
-                .thenReturn("http://www.example.com")
-
-            val url = adapter.urlWithParameters(
-                HarvestAdminParameters(
-                    publisherId = "123456789",
-                    dataSourceId = "ds-id"
-                )
-            )
-
-            assertEquals(URL("http://www.example.com/organizations/123456789/datasources/ds-id?dataType=publicService"), url)
-        }
-
-        @Test
         fun severalParameters() {
             whenever(valuesMock.harvestAdminRootUrl)
                 .thenReturn("http://www.example.com")
