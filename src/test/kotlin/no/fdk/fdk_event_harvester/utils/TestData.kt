@@ -23,6 +23,7 @@ val TEST_HARVEST_DATE: Calendar = Calendar.Builder().setTimeZone(TimeZone.getTim
 val NEW_TEST_HARVEST_DATE: Calendar = Calendar.Builder().setTimeZone(TimeZone.getTimeZone("UTC")).setDate(2020, 9, 15).setTimeOfDay(11, 52, 16, 122).build()
 
 val TEST_HARVEST_SOURCE = HarvestDataSource(
+    id = "test-source",
     url = "http://localhost:5000/fdk-public-service-publisher.ttl",
     acceptHeaderValue = "text/turtle",
     dataType = "publicService",

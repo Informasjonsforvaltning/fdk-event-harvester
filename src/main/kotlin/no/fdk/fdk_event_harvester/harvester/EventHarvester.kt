@@ -16,9 +16,13 @@ import org.apache.jena.vocabulary.RDF
 import org.slf4j.LoggerFactory
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 private val LOGGER = LoggerFactory.getLogger(EventHarvester::class.java)
+private const val dateFormat: String = "yyyy-MM-dd HH:mm:ss Z"
 
 @Service
 class EventHarvester(
@@ -28,44 +32,86 @@ class EventHarvester(
     private val applicationProperties: ApplicationProperties
 ) {
 
-    fun harvestEvents(source: HarvestDataSource, harvestDate: Calendar) =
-        source.url?.let { sourceURL ->
-            LOGGER.debug("Starting harvest of $sourceURL")
-            val jenaWriterType = jenaTypeFromAcceptHeader(source.acceptHeaderValue)
+    fun harvestEvents(source: HarvestDataSource, harvestDate: Calendar): HarvestReport? =
+        if (source.id != null && source.url != null) {
 
-            val harvested = when (jenaWriterType) {
-                null -> null
-                Lang.RDFNULL -> null
-                else -> adapter.getEvents(source)?.let { parseRDFResponse(it, jenaWriterType, sourceURL) }
+            try {
+                LOGGER.debug("Starting harvest of ${source.url}")
+
+                when (val jenaWriterType = jenaTypeFromAcceptHeader(source.acceptHeaderValue)) {
+                    null -> {
+                        LOGGER.error(
+                            "Not able to harvest from ${source.url}, no accept header supplied",
+                            HarvestException(source.url)
+                        )
+                        HarvestReport(
+                            id = source.id,
+                            url = source.url,
+                            harvestError = true,
+                            errorMessage = "Not able to harvest, no accept header supplied",
+                            startTime = harvestDate.formatWithOsloTimeZone(),
+                            endTime = formatNowWithOsloTimeZone()
+                        )
+                    }
+                    Lang.RDFNULL -> {
+                        LOGGER.error(
+                            "Not able to harvest from ${source.url}, header ${source.acceptHeaderValue} is not acceptable",
+                            HarvestException(source.url)
+                        )
+                        HarvestReport(
+                            id = source.id,
+                            url = source.url,
+                            harvestError = true,
+                            errorMessage = "Not able to harvest, no accept header supplied",
+                            startTime = harvestDate.formatWithOsloTimeZone(),
+                            endTime = formatNowWithOsloTimeZone()
+                        )
+                    }
+                    else -> updateIfChanged(
+                        parseRDFResponse(adapter.getEvents(source), jenaWriterType, source.url),
+                        source.id, source.url, harvestDate
+                    )
+                }
+            } catch (ex: Exception) {
+                LOGGER.error("Harvest of ${source.url} failed", ex)
+                HarvestReport(
+                    id = source.id,
+                    url = source.url,
+                    harvestError = true,
+                    errorMessage = ex.message,
+                    startTime = harvestDate.formatWithOsloTimeZone(),
+                    endTime = formatNowWithOsloTimeZone()
+                )
             }
+        } else {
+            LOGGER.error("Harvest source is not defined", HarvestException("undefined"))
+            null
+        }
 
-            when {
-                jenaWriterType == null -> LOGGER.error("Not able to harvest from $sourceURL, no accept header supplied", HarvestException(sourceURL))
-                jenaWriterType == Lang.RDFNULL -> LOGGER.error("Not able to harvest from $sourceURL, header ${source.acceptHeaderValue} is not acceptable", HarvestException(sourceURL))
-                harvested == null -> LOGGER.info("Not able to harvest $sourceURL")
-                else -> updateIfHarvestedContainsChanges(harvested, sourceURL, harvestDate)
-            }
-        } ?: LOGGER.error("Harvest source is not defined", HarvestException("undefined"))
-
-    private fun updateIfHarvestedContainsChanges(harvested: Model, sourceURL: String, harvestDate: Calendar) {
+    private fun updateIfChanged(harvested: Model, sourceId: String, sourceURL: String, harvestDate: Calendar): HarvestReport {
         val dbData = turtleService.getHarvestSource(sourceURL)
             ?.let { parseRDFResponse(it, Lang.TURTLE, null) }
 
-        if (dbData != null && harvested.isIsomorphicWith(dbData)) {
+        return if (dbData != null && harvested.isIsomorphicWith(dbData)) {
             LOGGER.info("No changes from last harvest of $sourceURL")
+            HarvestReport(
+                id = sourceId,
+                url = sourceURL,
+                harvestError = false,
+                startTime = harvestDate.formatWithOsloTimeZone(),
+                endTime = formatNowWithOsloTimeZone()
+            )
         } else {
             LOGGER.info("Changes detected, saving data from $sourceURL, and updating FDK meta data")
             turtleService.saveAsHarvestSource(harvested, sourceURL)
 
-            val events = splitEventsFromRDF(harvested, sourceURL)
-
-            if (events.isEmpty()) LOGGER.error("No events found in data harvested from $sourceURL", HarvestException(sourceURL))
-            else updateDB(events, harvestDate)
+            updateDB(harvested, sourceId, sourceURL, harvestDate)
         }
     }
 
-    private fun updateDB(events: List<EventRDFModel>, harvestDate: Calendar) {
-        events
+    private fun updateDB(harvested: Model, sourceId: String, sourceURL: String, harvestDate: Calendar): HarvestReport {
+        val updatedEvents = mutableListOf<EventMeta>()
+        splitEventsFromRDF(harvested, sourceURL)
             .map { Pair(it, metaRepository.findByIdOrNull(it.eventURI)) }
             .filter { it.first.eventHasChanges(it.second?.fdkId) }
             .forEach {
@@ -85,7 +131,17 @@ class EventHarvester(
                     .addProperty(DCTerms.modified, metaModel.createTypedLiteral(harvestDate))
 
                 turtleService.saveAsEvent(metaModel.union(it.first.harvested), updatedMeta.fdkId, true)
+                updatedEvents.add(updatedMeta)
             }
+        LOGGER.debug("Harvest of $sourceURL completed")
+        return HarvestReport(
+            id = sourceId,
+            url = sourceURL,
+            harvestError = false,
+            startTime = harvestDate.formatWithOsloTimeZone(),
+            endTime = formatNowWithOsloTimeZone(),
+            changedResources = updatedEvents.map { FdkIdAndUri(fdkId = it.fdkId, uri = it.uri) }
+        )
     }
 
     private fun EventRDFModel.updateMeta(
@@ -108,4 +164,12 @@ class EventHarvester(
     private fun EventRDFModel.eventHasChanges(fdkId: String?): Boolean =
         if (fdkId == null) true
         else harvestDiff(turtleService.getEvent(fdkId, withRecords = false))
+
+    private fun formatNowWithOsloTimeZone(): String =
+        ZonedDateTime.now(ZoneId.of("Europe/Oslo"))
+            .format(DateTimeFormatter.ofPattern(dateFormat))
+
+    private fun Calendar.formatWithOsloTimeZone(): String =
+        ZonedDateTime.from(toInstant().atZone(ZoneId.of("Europe/Oslo")))
+            .format(DateTimeFormatter.ofPattern(dateFormat))
 }

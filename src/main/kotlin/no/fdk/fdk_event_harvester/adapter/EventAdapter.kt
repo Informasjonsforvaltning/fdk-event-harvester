@@ -15,7 +15,7 @@ private const val TEN_MINUTES = 600000
 @Service
 class EventAdapter {
 
-    fun getEvents(source: HarvestDataSource): String? {
+    fun getEvents(source: HarvestDataSource): String {
         val connection = URL(source.url).openConnection() as HttpURLConnection
         try {
             connection.setRequestProperty("Accept", source.acceptHeaderValue)
@@ -23,8 +23,9 @@ class EventAdapter {
             connection.readTimeout = TEN_MINUTES
 
             return if (connection.responseCode != HttpStatus.OK.value()) {
-                LOGGER.error("${source.url} responded with ${connection.responseCode}, harvest will be aborted", HarvestException(source.url ?: "undefined"))
-                null
+                val exception = HarvestException("${source.url} responded with ${connection.responseCode}, harvest will be aborted")
+                LOGGER.error("${source.url} responded with ${connection.responseCode}, harvest will be aborted", exception)
+                throw exception
             } else {
                 connection
                     .inputStream
@@ -34,7 +35,7 @@ class EventAdapter {
 
         } catch (ex: Exception) {
             LOGGER.error("Error when harvesting from ${source.url}", ex)
-            return null
+            throw ex
         } finally {
             connection.disconnect()
         }

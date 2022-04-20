@@ -4,6 +4,8 @@ import com.nhaarman.mockitokotlin2.*
 import no.fdk.fdk_event_harvester.adapter.EventAdapter
 import no.fdk.fdk_event_harvester.configuration.ApplicationProperties
 import no.fdk.fdk_event_harvester.model.EventMeta
+import no.fdk.fdk_event_harvester.model.FdkIdAndUri
+import no.fdk.fdk_event_harvester.model.HarvestReport
 import no.fdk.fdk_event_harvester.repository.EventMetaRepository
 import no.fdk.fdk_event_harvester.service.TurtleService
 import no.fdk.fdk_event_harvester.utils.*
@@ -31,7 +33,7 @@ class HarvesterTest {
         whenever(valuesMock.eventsUri)
             .thenReturn("http://localhost:5000/events")
 
-        harvester.harvestEvents(TEST_HARVEST_SOURCE, TEST_HARVEST_DATE)
+        val report = harvester.harvestEvents(TEST_HARVEST_SOURCE, TEST_HARVEST_DATE)
 
         argumentCaptor<Model, String>().apply {
             verify(turtleService, times(1)).saveAsHarvestSource(first.capture(), second.capture())
@@ -61,6 +63,20 @@ class HarvesterTest {
             verify(metaRepository, times(2)).save(capture())
             assertEquals(listOf(EVENT_META_0, EVENT_META_1), allValues.sortedBy { it.uri })
         }
+
+        val expectedReport = HarvestReport(
+            id="test-source",
+            url="http://localhost:5000/fdk-public-service-publisher.ttl",
+            dataType="event",
+            harvestError=false,
+            startTime = "2020-10-05 15:15:39 +0200",
+            endTime = report!!.endTime,
+            changedResources = listOf(
+                FdkIdAndUri(fdkId="fa7176b4-7743-3543-8c71-86c46e7f3654", uri="http://public-service-publisher.fellesdatakatalog.digdir.no/events/1"),
+                FdkIdAndUri(fdkId="4a9dae51-52ba-3a8c-b3da-e55ccaa4639d", uri="http://public-service-publisher.fellesdatakatalog.digdir.no/lifeevents/1"))
+        )
+
+        kotlin.test.assertEquals(expectedReport, report)
     }
 
     @Test
@@ -73,7 +89,7 @@ class HarvesterTest {
         whenever(turtleService.getHarvestSource(TEST_HARVEST_SOURCE.url!!))
             .thenReturn(harvested)
 
-        harvester.harvestEvents(TEST_HARVEST_SOURCE, TEST_HARVEST_DATE)
+        val report = harvester.harvestEvents(TEST_HARVEST_SOURCE, TEST_HARVEST_DATE)
 
         argumentCaptor<Model, String>().apply {
             verify(turtleService, times(0)).saveAsHarvestSource(first.capture(), second.capture())
@@ -86,6 +102,17 @@ class HarvesterTest {
         argumentCaptor<EventMeta>().apply {
             verify(metaRepository, times(0)).save(capture())
         }
+
+        val expectedReport = HarvestReport(
+            id="test-source",
+            url="http://localhost:5000/fdk-public-service-publisher.ttl",
+            dataType="event",
+            harvestError=false,
+            startTime = "2020-10-05 15:15:39 +0200",
+            endTime = report!!.endTime
+        )
+
+        kotlin.test.assertEquals(expectedReport, report)
     }
 
     @Test
@@ -105,7 +132,7 @@ class HarvesterTest {
         whenever(turtleService.getEvent(EVENT_ID_1, false))
             .thenReturn(responseReader.readFile("no_records_event_1_diff.ttl"))
 
-        harvester.harvestEvents(TEST_HARVEST_SOURCE, NEW_TEST_HARVEST_DATE)
+        val report = harvester.harvestEvents(TEST_HARVEST_SOURCE, NEW_TEST_HARVEST_DATE)
 
         argumentCaptor<Model, String>().apply {
             verify(turtleService, times(1)).saveAsHarvestSource(first.capture(), second.capture())
@@ -126,6 +153,17 @@ class HarvesterTest {
             assertEquals(EVENT_META_1.copy(modified = NEW_TEST_HARVEST_DATE.timeInMillis), firstValue)
         }
 
+        val expectedReport = HarvestReport(
+            id="test-source",
+            url="http://localhost:5000/fdk-public-service-publisher.ttl",
+            dataType="event",
+            harvestError=false,
+            startTime = "2020-10-15 13:52:16 +0200",
+            endTime = report!!.endTime,
+            changedResources = listOf(FdkIdAndUri(fdkId="4a9dae51-52ba-3a8c-b3da-e55ccaa4639d", uri="http://public-service-publisher.fellesdatakatalog.digdir.no/lifeevents/1"))
+        )
+
+        kotlin.test.assertEquals(expectedReport, report)
     }
 
     @Test
@@ -135,7 +173,7 @@ class HarvesterTest {
         whenever(valuesMock.eventsUri)
             .thenReturn("http://localhost:5000/public-services")
 
-        harvester.harvestEvents(TEST_HARVEST_SOURCE, TEST_HARVEST_DATE)
+        val report = harvester.harvestEvents(TEST_HARVEST_SOURCE, TEST_HARVEST_DATE)
 
         argumentCaptor<Model, String>().apply {
             verify(turtleService, times(0)).saveAsHarvestSource(first.capture(), second.capture())
@@ -148,6 +186,18 @@ class HarvesterTest {
         argumentCaptor<EventMeta>().apply {
             verify(metaRepository, times(0)).save(capture())
         }
+
+        val expectedReport = HarvestReport(
+            id="test-source",
+            url="http://localhost:5000/fdk-public-service-publisher.ttl",
+            dataType="event",
+            harvestError=true,
+            errorMessage = "[line: 1, col: 76] Undefined prefix: cpsv",
+            startTime = "2020-10-05 15:15:39 +0200",
+            endTime = report!!.endTime
+        )
+
+        kotlin.test.assertEquals(expectedReport, report)
     }
 
 }
