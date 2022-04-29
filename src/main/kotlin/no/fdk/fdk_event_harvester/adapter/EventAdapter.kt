@@ -23,9 +23,7 @@ class EventAdapter {
             connection.readTimeout = TEN_MINUTES
 
             return if (connection.responseCode != HttpStatus.OK.value()) {
-                val exception = HarvestException("${source.url} responded with ${connection.responseCode}, harvest will be aborted")
-                LOGGER.error("${source.url} responded with ${connection.responseCode}, harvest will be aborted", exception)
-                throw exception
+                throw HarvestException("${source.url} responded with ${connection.responseCode}, harvest will be aborted")
             } else {
                 connection
                     .inputStream
@@ -33,9 +31,6 @@ class EventAdapter {
                     .use(BufferedReader::readText)
             }
 
-        } catch (ex: Exception) {
-            LOGGER.error("Error when harvesting from ${source.url}", ex)
-            throw ex
         } finally {
             connection.disconnect()
         }
