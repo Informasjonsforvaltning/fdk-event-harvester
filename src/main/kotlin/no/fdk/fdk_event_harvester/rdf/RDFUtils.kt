@@ -30,13 +30,7 @@ fun jenaTypeFromAcceptHeader(accept: String?): Lang? =
 
 fun parseRDFResponse(responseBody: String, rdfLanguage: Lang, rdfSource: String?): Model {
     val responseModel = ModelFactory.createDefaultModel()
-
-    try {
-        responseModel.read(StringReader(responseBody), BACKUP_BASE_URI, rdfLanguage.name)
-    } catch (ex: Exception) {
-        logger.error("Parse from $rdfSource has failed", ex)
-        throw ex
-    }
+    responseModel.read(StringReader(responseBody), BACKUP_BASE_URI, rdfLanguage.name)
 
     return responseModel
 }
