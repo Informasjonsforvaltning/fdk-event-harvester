@@ -1,3 +1,4 @@
+@prefix cpsvno: <https://data.norge.no/vocabulary/cpsvno#> .
 @prefix schema: <http://schema.org/> .
 @prefix cv:    <http://data.europa.eu/m8g/> .
 @prefix eli:   <http://data.europa.eu/eli/ontology#> .
@@ -12,7 +13,7 @@
         a               skos:Concept ;
         skos:prefLabel  "Starte og drive en bedrift"@nb , "Starting business"@en .
 
-<http://public-service-publisher.fellesdatakatalog.digdir.no/events/1>
+<http://testdirektoratet.no/events/0>
         a                cv:BusinessEvent ;
         dct:description  "Elektronisk prosess for etablering og oppstart av en bedrift."@nb ;
         dct:identifier   "1" ;
@@ -24,7 +25,7 @@
         a               skos:Concept ;
         skos:prefLabel  "Få barn"@nb , "Having a child"@en .
 
-<http://public-service-publisher.fellesdatakatalog.digdir.no/lifeevents/1>
+<http://testdirektoratet.no/events/1>
         a                         cv:LifeEvent ;
         cv:hasCompetentAuthority  <https://data.brreg.no/enhetsregisteret/api/enheter/983887457> ;
         dct:description           "ASD forvalter i dag flere ordninger i folketrygdloven med relevans for livshendelsen. Direktoratet forvalter også ordninger som tilhører BFD. I forbindelse med direktoratets langsiktige IKT-moderniseringsarbeid er det innført digitale tjenester for innsyn, dialog, samhandling og automatisert saksbehandling for foreldrepenger og pleiepenger. Dette digitaliseringsarbeidet understøtter målsettingene i digitaliseringsstrategien."@nb ;
@@ -32,3 +33,15 @@
         dct:relation              <http://public-service-publisher.fellesdatakatalog.digdir.no/services/13> ;
         dct:title                 "Få barn"@nb ;
         dct:type                  <https://data.norge.no/concepts/304> .
+
+<http://testdirektoratet.no/events/2>  a cv:Event;
+   dct:identifier "https://raw.githubusercontent.com/Informasjonsforvaltning/cpsv-ap-no/develop/examples/exHendelse.ttl"^^xsd:anyURI;
+   dct:title """Vedtak om skjenkebevilling"""@nb;
+   dct:description """Det er fattet vedtak om å gi skjenkebevilling til «Den beste restauranten AS», for servering av alkoholholdig drikk i gruppe 1, jf. Alkoholloven § 4-2"""@nb,
+       """Teksten blir vist på nynorsk."""@nn,
+       """The text is displayed in English."""@en;
+   cpsvno:mayInitiate <https://raw.githubusercontent.com/Informasjonsforvaltning/cpsv-ap-no/develop/examples/exTjenesteDummy.ttl>;
+   dct:subject <https://data.norge.no/concepts/ad2ab3f9-17a1-4494-b15e-4ba3967a6424>;
+   dcat:distribution <https://example.org/example-distribusjon>;
+   dct:type <https://data.norge.no/vocabulary/event-type#administrative-decision-made>;
+   .

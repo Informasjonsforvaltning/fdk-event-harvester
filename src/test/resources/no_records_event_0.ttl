@@ -12,7 +12,7 @@
         a               skos:Concept ;
         skos:prefLabel  "Starte og drive en bedrift"@nb , "Starting business"@en .
 
-<http://public-service-publisher.fellesdatakatalog.digdir.no/events/1>
+<http://testdirektoratet.no/events/0>
         a                cv:BusinessEvent ;
         dct:description  "Elektronisk prosess for etablering og oppstart av en bedrift."@nb ;
         dct:identifier   "1" ;

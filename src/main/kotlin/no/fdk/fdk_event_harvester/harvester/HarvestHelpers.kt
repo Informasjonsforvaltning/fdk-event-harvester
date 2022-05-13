@@ -2,6 +2,7 @@ package no.fdk.fdk_event_harvester.harvester
 
 import no.fdk.fdk_event_harvester.Application
 import no.fdk.fdk_event_harvester.rdf.CPSV
+import no.fdk.fdk_event_harvester.rdf.CPSVNO
 import no.fdk.fdk_event_harvester.rdf.CV
 import no.fdk.fdk_event_harvester.rdf.parseRDFResponse
 import org.apache.jena.query.QueryExecutionFactory
@@ -22,6 +23,11 @@ fun EventRDFModel.harvestDiff(dboNoRecords: String?): Boolean =
     else !harvested.isIsomorphicWith(parseRDFResponse(dboNoRecords, Lang.TURTLE, null))
 
 fun splitEventsFromRDF(harvested: Model, sourceURL: String): List<EventRDFModel> {
+    val events = harvested.listResourcesWithProperty(RDF.type, CV.Event)
+        .toList()
+        .filterBlankNodeEvents(sourceURL)
+        .map { it.extractEventModel(harvested.nsPrefixMap) }
+
     val businessEvents = harvested.listResourcesWithProperty(RDF.type, CV.BusinessEvent)
         .toList()
         .filterBlankNodeEvents(sourceURL)
@@ -32,7 +38,7 @@ fun splitEventsFromRDF(harvested: Model, sourceURL: String): List<EventRDFModel>
         .filterBlankNodeEvents(sourceURL)
         .map { it.extractEventModel(harvested.nsPrefixMap) }
 
-    return listOf(businessEvents, lifeEvents).flatten()
+    return listOf(events, businessEvents, lifeEvents).flatten()
 }
 
 private fun List<Resource>.filterBlankNodeEvents(sourceURL: String): List<Resource> =
@@ -104,6 +110,8 @@ private fun Model.resourceShouldBeAdded(resource: Resource): Boolean {
 
     return when {
         types.contains(CPSV.PublicService) -> false
+        types.contains(CPSVNO.Service) -> false
+        types.contains(CV.Event) -> false
         types.contains(CV.BusinessEvent) -> false
         types.contains(CV.LifeEvent) -> false
         !resource.isURIResource -> true
