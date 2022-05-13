@@ -12,7 +12,7 @@
         a               skos:Concept ;
         skos:prefLabel  "Få barn"@nb , "Having a child"@en .
 
-<http://public-service-publisher.fellesdatakatalog.digdir.no/lifeevents/1>
+<http://testdirektoratet.no/events/1>
         a                         cv:LifeEvent ;
         cv:hasCompetentAuthority  <https://data.brreg.no/enhetsregisteret/api/enheter/983887457> ;
         dct:description           "ASD forvalter..."@nb ;

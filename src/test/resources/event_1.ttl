@@ -12,7 +12,7 @@
         a               skos:Concept ;
         skos:prefLabel  "Få barn"@nb , "Having a child"@en .
 
-<http://public-service-publisher.fellesdatakatalog.digdir.no/lifeevents/1>
+<http://testdirektoratet.no/events/1>
         a                         cv:LifeEvent ;
         cv:hasCompetentAuthority  <https://data.brreg.no/enhetsregisteret/api/enheter/983887457> ;
         dct:description           "ASD forvalter i dag flere ordninger i folketrygdloven med relevans for livshendelsen. Direktoratet forvalter også ordninger som tilhører BFD. I forbindelse med direktoratets langsiktige IKT-moderniseringsarbeid er det innført digitale tjenester for innsyn, dialog, samhandling og automatisert saksbehandling for foreldrepenger og pleiepenger. Dette digitaliseringsarbeidet understøtter målsettingene i digitaliseringsstrategien."@nb ;
@@ -21,9 +21,9 @@
         dct:title                 "Få barn"@nb ;
         dct:type                  <https://data.norge.no/concepts/304> .
 
-<http://localhost:5000/events/4a9dae51-52ba-3a8c-b3da-e55ccaa4639d>
+<http://localhost:5000/events/99b00c6c-4087-3c23-9244-6e85b9d02adc>
         a                  dcat:CatalogRecord ;
-        dct:identifier     "4a9dae51-52ba-3a8c-b3da-e55ccaa4639d" ;
+        dct:identifier     "99b00c6c-4087-3c23-9244-6e85b9d02adc" ;
         dct:issued         "2020-10-05T13:15:39.831Z"^^xsd:dateTime ;
         dct:modified       "2020-10-05T13:15:39.831Z"^^xsd:dateTime ;
-        foaf:primaryTopic  <http://public-service-publisher.fellesdatakatalog.digdir.no/lifeevents/1> .
+        foaf:primaryTopic  <http://testdirektoratet.no/events/1> .

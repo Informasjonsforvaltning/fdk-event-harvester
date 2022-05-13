@@ -12,7 +12,7 @@
         a               skos:Concept ;
         skos:prefLabel  "Starte og drive en bedrift"@nb , "Starting business"@en .
 
-<http://public-service-publisher.fellesdatakatalog.digdir.no/events/1>
+<http://testdirektoratet.no/events/0>
         a                cv:BusinessEvent ;
         dct:description  "Elektronisk prosess for etablering og oppstart av en bedrift."@nb ;
         dct:identifier   "1" ;
@@ -20,9 +20,9 @@
         dct:title        "Starte og drive restaurant"@nb ;
         dct:type         <https://data.norge.no/concepts/300> .
 
-<http://localhost:5000/events/fa7176b4-7743-3543-8c71-86c46e7f3654>
+<http://localhost:5000/events/cbed84c4-a719-3370-b216-725bfc79978d>
         a                  dcat:CatalogRecord ;
-        dct:identifier     "fa7176b4-7743-3543-8c71-86c46e7f3654" ;
+        dct:identifier     "cbed84c4-a719-3370-b216-725bfc79978d" ;
         dct:issued         "2020-10-05T13:15:39.831Z"^^xsd:dateTime ;
         dct:modified       "2020-10-05T13:15:39.831Z"^^xsd:dateTime ;
-        foaf:primaryTopic  <http://public-service-publisher.fellesdatakatalog.digdir.no/events/1> .
+        foaf:primaryTopic  <http://testdirektoratet.no/events/0> .

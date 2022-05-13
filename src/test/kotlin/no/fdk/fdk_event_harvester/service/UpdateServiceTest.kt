@@ -56,17 +56,21 @@ class UpdateServiceTest {
         @Test
         fun updateUnionModel() {
             whenever(metaRepository.findAll())
-                .thenReturn(listOf(EVENT_META_0, EVENT_META_1))
+                .thenReturn(listOf(EVENT_META_0, EVENT_META_1, EVENT_META_2))
 
             whenever(turtleService.getEvent(EVENT_ID_0, true))
                 .thenReturn(responseReader.readFile("event_0.ttl"))
             whenever(turtleService.getEvent(EVENT_ID_1, true))
                 .thenReturn(responseReader.readFile("event_1.ttl"))
+            whenever(turtleService.getEvent(EVENT_ID_2, true))
+                .thenReturn(responseReader.readFile("event_2.ttl"))
 
             whenever(turtleService.getEvent(EVENT_ID_0, false))
                 .thenReturn(responseReader.readFile("no_records_event_0.ttl"))
             whenever(turtleService.getEvent(EVENT_ID_1, false))
                 .thenReturn(responseReader.readFile("no_records_event_1.ttl"))
+            whenever(turtleService.getEvent(EVENT_ID_2, false))
+                .thenReturn(responseReader.readFile("no_records_event_2.ttl"))
 
             updateService.updateUnionModel()
 

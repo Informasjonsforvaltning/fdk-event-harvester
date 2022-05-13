@@ -11,7 +11,7 @@ private val responseReader = TestResponseReader()
 
 
 val EVENT_META_0 = EventMeta(
-    uri = "http://public-service-publisher.fellesdatakatalog.digdir.no/events/1",
+    uri = "http://testdirektoratet.no/events/0",
     fdkId = EVENT_ID_0,
     issued = TEST_HARVEST_DATE.timeInMillis,
     modified = TEST_HARVEST_DATE.timeInMillis
@@ -31,7 +31,7 @@ val EVENT_TURTLE_0_NO_RECORDS = TurtleDBO(
 
 
 val EVENT_META_1 = EventMeta(
-    uri = "http://public-service-publisher.fellesdatakatalog.digdir.no/lifeevents/1",
+    uri = "http://testdirektoratet.no/events/1",
     fdkId = EVENT_ID_1,
     issued = TEST_HARVEST_DATE.timeInMillis,
     modified = TEST_HARVEST_DATE.timeInMillis
@@ -45,6 +45,25 @@ val EVENT_TURTLE_1 = TurtleDBO(
 val EVENT_TURTLE_1_NO_RECORDS = TurtleDBO(
     id = turtleId(EVENT_ID_1, false),
     turtle = gzip(responseReader.readFile("no_records_event_1.ttl"))
+)
+
+val EVENT_META_2 = EventMeta(
+    uri = "http://testdirektoratet.no/events/2",
+    fdkId = EVENT_ID_2,
+    issued = TEST_HARVEST_DATE.timeInMillis,
+    modified = TEST_HARVEST_DATE.timeInMillis
+)
+
+
+val EVENT_TURTLE_2 = TurtleDBO(
+    id = turtleId(EVENT_ID_2, true),
+    turtle = gzip(responseReader.readFile("event_2.ttl"))
+)
+
+
+val EVENT_TURTLE_2_NO_RECORDS = TurtleDBO(
+    id = turtleId(EVENT_ID_2, false),
+    turtle = gzip(responseReader.readFile("no_records_event_2.ttl"))
 )
 
 val HARVESTED_DBO = TurtleDBO(
@@ -65,12 +84,13 @@ val UNION_DATA_NO_RECORDS = TurtleDBO(
 fun turtlePopulation(): List<Document> =
     listOf(
         UNION_DATA, HARVESTED_DBO, EVENT_TURTLE_0, EVENT_TURTLE_1,
-        EVENT_TURTLE_0_NO_RECORDS, EVENT_TURTLE_1_NO_RECORDS, UNION_DATA_NO_RECORDS
+        EVENT_TURTLE_0_NO_RECORDS, EVENT_TURTLE_1_NO_RECORDS, UNION_DATA_NO_RECORDS,
+        EVENT_TURTLE_2, EVENT_TURTLE_2_NO_RECORDS
     )
         .map { it.mapDBO() }
 
 fun eventPopulation(): List<Document> =
-    listOf(EVENT_META_0, EVENT_META_1)
+    listOf(EVENT_META_0, EVENT_META_1, EVENT_META_2)
         .map { it.mapDBO() }
 
 private fun EventMeta.mapDBO(): Document =
