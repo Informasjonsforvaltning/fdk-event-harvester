@@ -32,7 +32,7 @@ class EventHarvester(
     private val applicationProperties: ApplicationProperties
 ) {
 
-    fun harvestEvents(source: HarvestDataSource, harvestDate: Calendar): HarvestReport? =
+    fun harvestEvents(source: HarvestDataSource, harvestDate: Calendar, forceUpdate: Boolean): HarvestReport? =
         if (source.id != null && source.url != null) {
 
             try {
@@ -69,7 +69,7 @@ class EventHarvester(
                     }
                     else -> updateIfChanged(
                         parseRDFResponse(adapter.getEvents(source), jenaWriterType, source.url),
-                        source.id, source.url, harvestDate
+                        source.id, source.url, harvestDate, forceUpdate
                     )
                 }
             } catch (ex: Exception) {
@@ -88,11 +88,11 @@ class EventHarvester(
             null
         }
 
-    private fun updateIfChanged(harvested: Model, sourceId: String, sourceURL: String, harvestDate: Calendar): HarvestReport {
+    private fun updateIfChanged(harvested: Model, sourceId: String, sourceURL: String, harvestDate: Calendar, forceUpdate: Boolean): HarvestReport {
         val dbData = turtleService.getHarvestSource(sourceURL)
             ?.let { parseRDFResponse(it, Lang.TURTLE, null) }
 
-        return if (dbData != null && harvested.isIsomorphicWith(dbData)) {
+        return if (!forceUpdate && dbData != null && harvested.isIsomorphicWith(dbData)) {
             LOGGER.info("No changes from last harvest of $sourceURL")
             HarvestReport(
                 id = sourceId,
@@ -105,15 +105,15 @@ class EventHarvester(
             LOGGER.info("Changes detected, saving data from $sourceURL, and updating FDK meta data")
             turtleService.saveAsHarvestSource(harvested, sourceURL)
 
-            updateDB(harvested, sourceId, sourceURL, harvestDate)
+            updateDB(harvested, sourceId, sourceURL, harvestDate, forceUpdate)
         }
     }
 
-    private fun updateDB(harvested: Model, sourceId: String, sourceURL: String, harvestDate: Calendar): HarvestReport {
+    private fun updateDB(harvested: Model, sourceId: String, sourceURL: String, harvestDate: Calendar, forceUpdate: Boolean): HarvestReport {
         val updatedEvents = mutableListOf<EventMeta>()
         splitEventsFromRDF(harvested, sourceURL)
             .map { Pair(it, metaRepository.findByIdOrNull(it.eventURI)) }
-            .filter { it.first.eventHasChanges(it.second?.fdkId) }
+            .filter { forceUpdate || it.first.eventHasChanges(it.second?.fdkId) }
             .forEach {
                 val updatedMeta = it.first.updateMeta(harvestDate, it.second)
                 metaRepository.save(updatedMeta)

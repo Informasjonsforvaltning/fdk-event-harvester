@@ -33,7 +33,7 @@ class HarvesterTest {
         whenever(valuesMock.eventsUri)
             .thenReturn("http://localhost:5000/events")
 
-        val report = harvester.harvestEvents(TEST_HARVEST_SOURCE, TEST_HARVEST_DATE)
+        val report = harvester.harvestEvents(TEST_HARVEST_SOURCE, TEST_HARVEST_DATE, false)
 
         argumentCaptor<Model, String>().apply {
             verify(turtleService, times(1)).saveAsHarvestSource(first.capture(), second.capture())
@@ -92,19 +92,11 @@ class HarvesterTest {
         whenever(turtleService.getHarvestSource(TEST_HARVEST_SOURCE.url!!))
             .thenReturn(harvested)
 
-        val report = harvester.harvestEvents(TEST_HARVEST_SOURCE, TEST_HARVEST_DATE)
+        val report = harvester.harvestEvents(TEST_HARVEST_SOURCE, TEST_HARVEST_DATE, false)
 
-        argumentCaptor<Model, String>().apply {
-            verify(turtleService, times(0)).saveAsHarvestSource(first.capture(), second.capture())
-        }
-
-        argumentCaptor<Model, String, Boolean>().apply {
-            verify(turtleService, times(0)).saveAsEvent(first.capture(), second.capture(), third.capture())
-        }
-
-        argumentCaptor<EventMeta>().apply {
-            verify(metaRepository, times(0)).save(capture())
-        }
+        verify(turtleService, times(0)).saveAsHarvestSource(any(), any())
+        verify(turtleService, times(0)).saveAsEvent(any(), any(), any())
+        verify(metaRepository, times(0)).save(any())
 
         val expectedReport = HarvestReport(
             id="test-source",
@@ -113,6 +105,38 @@ class HarvesterTest {
             harvestError=false,
             startTime = "2020-10-05 15:15:39 +0200",
             endTime = report!!.endTime
+        )
+
+        kotlin.test.assertEquals(expectedReport, report)
+    }
+
+    @Test
+    fun noChangesIgnoredWhenForceUpdateIsTrue() {
+        val harvested = responseReader.readFile("harvest_response_0.ttl")
+        whenever(adapter.getEvents(TEST_HARVEST_SOURCE))
+            .thenReturn(harvested)
+        whenever(valuesMock.eventsUri)
+            .thenReturn("http://localhost:5000/public-services")
+        whenever(turtleService.getHarvestSource(TEST_HARVEST_SOURCE.url!!))
+            .thenReturn(harvested)
+
+        val report = harvester.harvestEvents(TEST_HARVEST_SOURCE, TEST_HARVEST_DATE, true)
+
+        verify(turtleService, times(1)).saveAsHarvestSource(any(), any())
+        verify(turtleService, times(6)).saveAsEvent(any(), any(), any())
+        verify(metaRepository, times(3)).save(any())
+
+        val expectedReport = HarvestReport(
+            id="test-source",
+            url="http://localhost:5000/fdk-public-service-publisher.ttl",
+            dataType="event",
+            harvestError=false,
+            startTime = "2020-10-05 15:15:39 +0200",
+            endTime = report!!.endTime,
+            changedResources=listOf(
+                FdkIdAndUri(fdkId="fb77d4f2-a11c-33e3-8c49-772c4569613b", uri="http://testdirektoratet.no/events/2"),
+                FdkIdAndUri(fdkId="cbed84c4-a719-3370-b216-725bfc79978d", uri="http://testdirektoratet.no/events/0"),
+                FdkIdAndUri(fdkId="99b00c6c-4087-3c23-9244-6e85b9d02adc", uri="http://testdirektoratet.no/events/1"))
         )
 
         kotlin.test.assertEquals(expectedReport, report)
@@ -139,7 +163,7 @@ class HarvesterTest {
         whenever(turtleService.getEvent(EVENT_ID_2, false))
             .thenReturn(responseReader.readFile("no_records_event_2.ttl"))
 
-        val report = harvester.harvestEvents(TEST_HARVEST_SOURCE, NEW_TEST_HARVEST_DATE)
+        val report = harvester.harvestEvents(TEST_HARVEST_SOURCE, NEW_TEST_HARVEST_DATE, false)
 
         argumentCaptor<Model, String>().apply {
             verify(turtleService, times(1)).saveAsHarvestSource(first.capture(), second.capture())
@@ -180,19 +204,11 @@ class HarvesterTest {
         whenever(valuesMock.eventsUri)
             .thenReturn("http://localhost:5000/public-services")
 
-        val report = harvester.harvestEvents(TEST_HARVEST_SOURCE, TEST_HARVEST_DATE)
+        val report = harvester.harvestEvents(TEST_HARVEST_SOURCE, TEST_HARVEST_DATE, false)
 
-        argumentCaptor<Model, String>().apply {
-            verify(turtleService, times(0)).saveAsHarvestSource(first.capture(), second.capture())
-        }
-
-        argumentCaptor<Model, String, Boolean>().apply {
-            verify(turtleService, times(0)).saveAsEvent(first.capture(), second.capture(), third.capture())
-        }
-
-        argumentCaptor<EventMeta>().apply {
-            verify(metaRepository, times(0)).save(capture())
-        }
+        verify(turtleService, times(0)).saveAsHarvestSource(any(), any())
+        verify(turtleService, times(0)).saveAsEvent(any(), any(), any())
+        verify(metaRepository, times(0)).save(any())
 
         val expectedReport = HarvestReport(
             id="test-source",

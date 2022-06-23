@@ -13,8 +13,11 @@ data class HarvestDataSource (
 
 @JsonIgnoreProperties(ignoreUnknown=true)
 data class HarvestAdminParameters(
-    val dataSourceId: String? = null,
-    val publisherId: String? = null,
-    val dataSourceType: String? = null,
+    val dataSourceId: String?,
+    val publisherId: String?,
+    val dataSourceType: String?,
     val dataType: String? = "publicService"
-)
+) {
+    fun harvestAllEvents(): Boolean =
+        dataSourceId == null && publisherId == null && dataSourceType == null
+}
