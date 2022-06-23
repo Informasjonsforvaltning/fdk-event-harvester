@@ -26,24 +26,24 @@ class HarvesterActivity(
     private val activitySemaphore = Semaphore(1)
 
     @EventListener
-    fun fullHarvestOnStartup(event: ApplicationReadyEvent) = initiateHarvest(null)
+    fun fullHarvestOnStartup(event: ApplicationReadyEvent) = initiateHarvest(HarvestAdminParameters(null, null, null), false)
 
-    fun initiateHarvest(params: HarvestAdminParameters?) {
-        if (params == null) LOGGER.debug("starting harvest of all events")
-        else LOGGER.debug("starting harvest with parameters $params")
+    fun initiateHarvest(params: HarvestAdminParameters, forceUpdate: Boolean) {
+        if (params.harvestAllEvents()) LOGGER.debug("starting harvest of all events, force update: $forceUpdate")
+        else LOGGER.debug("starting harvest with parameters $params, force update: $forceUpdate")
 
         launch {
             activitySemaphore.withPermit {
-                harvestAdminAdapter.getDataSources(params ?: HarvestAdminParameters())
+                harvestAdminAdapter.getDataSources(params)
                     .filter { it.dataType == "publicService" }
                     .filter { it.url != null }
-                    .map { async { harvester.harvestEvents(it, Calendar.getInstance()) } }
+                    .map { async { harvester.harvestEvents(it, Calendar.getInstance(), forceUpdate) } }
                     .awaitAll()
                     .filterNotNull()
                     .also { updateService.updateUnionModel() }
                     .also {
-                        if (params != null) LOGGER.debug("completed harvest with parameters $params")
-                        else LOGGER.debug("completed harvest of all catalogs") }
+                        if (params.harvestAllEvents()) LOGGER.debug("completed harvest with parameters $params, force update: $forceUpdate")
+                        else LOGGER.debug("completed harvest of all catalogs, force update: $forceUpdate") }
                     .run { publisher.send(this) }
             }
         }
