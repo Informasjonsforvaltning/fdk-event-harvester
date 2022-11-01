@@ -13,7 +13,7 @@
     <parent>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-parent</artifactId>
-      <version>2.7.1</version>
+      <version>2.7.5</version>
       <relativePath/>
     </parent>
 
@@ -28,9 +28,9 @@
         <maven.exec.skip>false</maven.exec.skip>
         <!--end standard properties-->
 
-        <kotlin.version>1.7.0</kotlin.version>
-        <testcontainers.version>1.17.2</testcontainers.version>
-        <jena.version>4.5.0</jena.version>
+        <kotlin.version>1.7.20</kotlin.version>
+        <testcontainers.version>1.17.5</testcontainers.version>
+        <jena.version>4.6.1</jena.version>
     </properties>
 
     <dependencies>
@@ -69,7 +69,7 @@
         <dependency>
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-registry-statsd</artifactId>
-            <version>1.9.1</version>
+            <version>1.9.5</version>
         </dependency>
 
         <!-- Kotlin dependencies -->
@@ -86,7 +86,7 @@
         <dependency>
             <groupId>org.jetbrains.kotlinx</groupId>
             <artifactId>kotlinx-coroutines-core</artifactId>
-            <version>1.6.3</version>
+            <version>1.6.4</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.module</groupId>
@@ -124,9 +124,9 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>com.nhaarman.mockitokotlin2</groupId>
+            <groupId>org.mockito.kotlin</groupId>
             <artifactId>mockito-kotlin</artifactId>
-            <version>2.2.0</version>
+            <version>4.0.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>

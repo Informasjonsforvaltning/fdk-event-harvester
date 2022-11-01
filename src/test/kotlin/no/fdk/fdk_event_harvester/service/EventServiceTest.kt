@@ -1,12 +1,12 @@
 package no.fdk.fdk_event_harvester.service
 
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
 import no.fdk.fdk_event_harvester.utils.*
 import org.apache.jena.riot.Lang
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 

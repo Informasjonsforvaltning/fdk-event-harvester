@@ -1,6 +1,5 @@
 package no.fdk.fdk_event_harvester.service
 
-import com.nhaarman.mockitokotlin2.*
 import no.fdk.fdk_event_harvester.configuration.ApplicationProperties
 import no.fdk.fdk_event_harvester.repository.EventMetaRepository
 import no.fdk.fdk_event_harvester.utils.*
@@ -10,6 +9,7 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.*
 
 @Tag("unit")
 class UpdateServiceTest {

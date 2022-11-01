@@ -1,6 +1,5 @@
 package no.fdk.fdk_event_harvester.harvester
 
-import com.nhaarman.mockitokotlin2.*
 import no.fdk.fdk_event_harvester.adapter.EventAdapter
 import no.fdk.fdk_event_harvester.configuration.ApplicationProperties
 import no.fdk.fdk_event_harvester.model.EventMeta
@@ -14,6 +13,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.*
 import java.util.*
 
 @Tag("unit")
