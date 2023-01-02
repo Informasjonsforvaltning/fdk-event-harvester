@@ -1,8 +1,12 @@
 package no.fdk.fdk_event_harvester.service
 
-import no.fdk.fdk_event_harvester.model.TurtleDBO
+import no.fdk.fdk_event_harvester.model.EventTurtle
+import no.fdk.fdk_event_harvester.model.FDKEventTurtle
+import no.fdk.fdk_event_harvester.model.HarvestSourceTurtle
 import no.fdk.fdk_event_harvester.rdf.createRDFResponse
-import no.fdk.fdk_event_harvester.repository.TurtleRepository
+import no.fdk.fdk_event_harvester.repository.EventTurtleRepository
+import no.fdk.fdk_event_harvester.repository.FDKEventTurtleRepository
+import no.fdk.fdk_event_harvester.repository.HarvestSourceTurtleRepository
 import org.apache.jena.rdf.model.Model
 import org.apache.jena.riot.Lang
 import org.springframework.data.repository.findByIdOrNull
@@ -13,56 +17,67 @@ import java.util.zip.GZIPInputStream
 import java.util.zip.GZIPOutputStream
 import kotlin.text.Charsets.UTF_8
 
-private const val NO_RECORDS_ID_PREFIX = "no-records-"
-const val UNION_ID = "event-union-graph"
+const val UNION_ID = "union-graph"
 
 
 @Service
-class TurtleService(private val turtleRepository: TurtleRepository) {
+class TurtleService(
+    private val eventRepository: EventTurtleRepository,
+    private val fdkEventRepository: FDKEventTurtleRepository,
+    private val harvestSourceRepository: HarvestSourceTurtleRepository
+) {
 
-    fun saveAsUnion(model: Model, withRecords: Boolean) =
-        turtleRepository.save(model.createUnionTurtleDBO(withRecords))
+    fun saveAsUnion(model: Model, withRecords: Boolean) {
+        if (withRecords) fdkEventRepository.save(model.createFDKEventTurtleDBO(UNION_ID))
+        else eventRepository.save(model.createEventTurtleDBO(UNION_ID))
+    }
 
     fun getUnion(withRecords: Boolean): String? =
-        turtleRepository.findByIdOrNull(turtleId(UNION_ID, withRecords))
+        if (withRecords) fdkEventRepository.findByIdOrNull(UNION_ID)
+            ?.turtle
+            ?.let { ungzip(it) }
+        else eventRepository.findByIdOrNull(UNION_ID)
             ?.turtle
             ?.let { ungzip(it) }
 
-    fun saveAsEvent(model: Model, fdkId: String, withRecords: Boolean) =
-        turtleRepository.save(model.createEventTurtleDBO(fdkId, withRecords))
+    fun saveAsEvent(model: Model, fdkId: String, withRecords: Boolean) {
+        if (withRecords) fdkEventRepository.save(model.createFDKEventTurtleDBO(fdkId))
+        else eventRepository.save(model.createEventTurtleDBO(fdkId))
+    }
 
     fun getEvent(fdkId: String, withRecords: Boolean): String? =
-        turtleRepository.findByIdOrNull(turtleId(fdkId, withRecords))
+        if (withRecords) fdkEventRepository.findByIdOrNull(fdkId)
+            ?.turtle
+            ?.let { ungzip(it) }
+        else eventRepository.findByIdOrNull(fdkId)
             ?.turtle
             ?.let { ungzip(it) }
 
-    fun saveAsHarvestSource(model: Model, uri: String) =
-        turtleRepository.save(model.createHarvestSourceTurtleDBO(uri))
+    fun saveAsHarvestSource(model: Model, uri: String) {
+        harvestSourceRepository.save(model.createHarvestSourceTurtleDBO(uri))
+    }
 
     fun getHarvestSource(uri: String): String? =
-        turtleRepository.findByIdOrNull(uri)
+        harvestSourceRepository.findByIdOrNull(uri)
             ?.turtle
             ?.let { ungzip(it) }
 
 }
 
-private fun Model.createUnionTurtleDBO(withRecords: Boolean): TurtleDBO =
-    TurtleDBO(
-        id = turtleId(UNION_ID, withRecords),
+private fun Model.createEventTurtleDBO(id: String): EventTurtle =
+    EventTurtle(
+        id = id,
         turtle = gzip(createRDFResponse(Lang.TURTLE))
     )
 
-private fun Model.createEventTurtleDBO(fdkId: String, withRecords: Boolean): TurtleDBO =
-    TurtleDBO(
-        id = turtleId(fdkId, withRecords),
+private fun Model.createFDKEventTurtleDBO(id: String): FDKEventTurtle =
+    FDKEventTurtle(
+        id = id,
         turtle = gzip(createRDFResponse(Lang.TURTLE))
     )
 
-fun turtleId(fdkId: String, withRecords: Boolean): String =
-    "${if (withRecords) "" else NO_RECORDS_ID_PREFIX}$fdkId"
-
-private fun Model.createHarvestSourceTurtleDBO(uri: String): TurtleDBO =
-    TurtleDBO(
+private fun Model.createHarvestSourceTurtleDBO(uri: String): HarvestSourceTurtle =
+    HarvestSourceTurtle(
         id = uri,
         turtle = gzip(createRDFResponse(Lang.TURTLE))
     )

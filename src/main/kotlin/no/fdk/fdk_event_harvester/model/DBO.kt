@@ -19,12 +19,27 @@ data class EventMeta (
     val modified: Long
 )
 
-@Document(collection = "turtle")
-data class TurtleDBO (
-        @Id
-        val id: String,
-        val turtle: String
-) {
+@Document(collection = "harvestSourceTurtle")
+data class HarvestSourceTurtle(
+    @Id override val id: String,
+    override val turtle: String
+) : TurtleDBO()
+
+@Document(collection = "eventTurtle")
+data class EventTurtle(
+    @Id override val id: String,
+    override val turtle: String
+) : TurtleDBO()
+
+@Document(collection = "fdkEventTurtle")
+data class FDKEventTurtle(
+    @Id override val id: String,
+    override val turtle: String
+) : TurtleDBO()
+
+abstract class TurtleDBO {
+    abstract val id: String
+    abstract val turtle: String
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -45,8 +60,12 @@ data class TurtleDBO (
 }
 
 private fun zippedModelsAreIsomorphic(zip0: String, zip1: String): Boolean {
-    val model0 = parseRDFResponse(ungzip(zip0), Lang.TURTLE, null)
-    val model1 = parseRDFResponse(ungzip(zip1), Lang.TURTLE, null)
+    val model0 = try {
+        parseRDFResponse(ungzip(zip0), Lang.TURTLE, null)
+    } catch (ex: Exception) { null }
+    val model1 = try {
+        parseRDFResponse(ungzip(zip1), Lang.TURTLE, null)
+    } catch (ex: Exception) { null }
 
     return when {
         model0 != null && model1 != null -> model0.isIsomorphicWith(model1)
