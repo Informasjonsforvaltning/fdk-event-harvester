@@ -92,11 +92,17 @@ fun populateDB() {
     val client: MongoClient = MongoClients.create(connectionString)
     val mongoDatabase = client.getDatabase(MONGO_COLLECTION).withCodecRegistry(pojoCodecRegistry)
 
-    val miscCollection = mongoDatabase.getCollection("turtle")
-    miscCollection.insertMany(turtlePopulation())
+    val harvestSourceTurtleCollection = mongoDatabase.getCollection("harvestSourceTurtle")
+    harvestSourceTurtleCollection.insertMany(harvestSourceTurtlePopulation())
 
-    val serviceCollection = mongoDatabase.getCollection("eventMeta")
-    serviceCollection.insertMany(eventPopulation())
+    val eventTurtleCollection = mongoDatabase.getCollection("eventTurtle")
+    eventTurtleCollection.insertMany(eventTurtlePopulation())
+
+    val fdkEventTurtleCollection = mongoDatabase.getCollection("fdkEventTurtle")
+    fdkEventTurtleCollection.insertMany(fdkEventTurtlePopulation())
+
+    val eventMetaCollection = mongoDatabase.getCollection("eventMeta")
+    eventMetaCollection.insertMany(eventMetaPopulation())
 
     client.close()
 }
