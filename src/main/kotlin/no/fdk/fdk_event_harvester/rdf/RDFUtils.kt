@@ -1,8 +1,12 @@
 package no.fdk.fdk_event_harvester.rdf
 
 import no.fdk.fdk_event_harvester.Application
+import org.apache.jena.query.QueryExecutionFactory
+import org.apache.jena.query.QueryFactory
 import org.apache.jena.rdf.model.Model
 import org.apache.jena.rdf.model.ModelFactory
+import org.apache.jena.rdf.model.Property
+import org.apache.jena.rdf.model.Resource
 import org.apache.jena.riot.Lang
 import org.slf4j.LoggerFactory
 import java.io.ByteArrayOutputStream
@@ -45,3 +49,16 @@ fun Model.createRDFResponse(responseType: Lang): String =
 fun createIdFromUri(uri: String): String =
     UUID.nameUUIDFromBytes(uri.toByteArray())
         .toString()
+
+fun Model.containsTriple(subj: String, pred: String, obj: String): Boolean {
+    val askQuery = "ASK { $subj $pred $obj }"
+
+    return try {
+        val query = QueryFactory.create(askQuery)
+        return QueryExecutionFactory.create(query, this).execAsk()
+    } catch (ex: Exception) { false }
+}
+
+fun Resource.safeAddProperty(property: Property, value: String?): Resource =
+    if (value.isNullOrEmpty()) this
+    else addProperty(property, model.createResource(value))

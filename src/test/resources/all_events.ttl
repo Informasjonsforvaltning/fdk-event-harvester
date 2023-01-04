@@ -64,3 +64,27 @@
         dct:type            <https://data.norge.no/vocabulary/event-type#administrative-decision-made> ;
         dcat:distribution   <https://example.org/example-distribusjon> ;
         cpsvno:mayInitiate  <https://raw.githubusercontent.com/Informasjonsforvaltning/cpsv-ap-no/develop/examples/exTjenesteDummy.ttl> .
+
+<http://test.no/events/0> a cv:Event ;
+  dct:identifier "0" ;
+  dct:title "Test event 0"@en .
+
+<http://localhost:5000/events/776fb75b-165f-3aa9-81bc-f322fa855ed7>
+  a                  dcat:CatalogRecord ;
+  dct:identifier     "776fb75b-165f-3aa9-81bc-f322fa855ed7" ;
+  dct:isPartOf       <http://localhost:5000/events/catalogs/b7c6d34c-624d-3c72-9e30-2b608e433ad7> ;
+  dct:issued         "2020-10-05T13:15:39.831Z"^^xsd:dateTime ;
+  dct:modified       "2020-10-05T13:15:39.831Z"^^xsd:dateTime ;
+  foaf:primaryTopic  <http://test.no/events/0> .
+
+<http://test.no/events/1> a cv:BusinessEvent ;
+  dct:identifier "1" ;
+  dct:title "Test event 1"@en .
+
+<http://localhost:5000/events/df191147-039c-3919-a180-acc909e55e47>
+  a                  dcat:CatalogRecord ;
+  dct:identifier     "df191147-039c-3919-a180-acc909e55e47" ;
+  dct:isPartOf       <http://localhost:5000/events/catalogs/b7c6d34c-624d-3c72-9e30-2b608e433ad7> ;
+  dct:issued         "2020-10-05T13:15:39.831Z"^^xsd:dateTime ;
+  dct:modified       "2020-10-05T13:15:39.831Z"^^xsd:dateTime ;
+  foaf:primaryTopic  <http://test.no/events/1> .

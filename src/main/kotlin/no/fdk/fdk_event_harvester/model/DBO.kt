@@ -15,12 +15,38 @@ data class EventMeta (
     @Indexed(unique = true)
     val fdkId: String,
 
+    val isPartOf: String? = null,
+    val issued: Long,
+    val modified: Long
+)
+
+@Document(collection = "catalogMeta")
+data class CatalogMeta(
+    @Id
+    val uri: String,
+
+    @Indexed(unique = true)
+    val fdkId: String,
+
+    val events: Set<String>,
     val issued: Long,
     val modified: Long
 )
 
 @Document(collection = "harvestSourceTurtle")
 data class HarvestSourceTurtle(
+    @Id override val id: String,
+    override val turtle: String
+) : TurtleDBO()
+
+@Document(collection = "catalogTurtle")
+data class CatalogTurtle(
+    @Id override val id: String,
+    override val turtle: String
+) : TurtleDBO()
+
+@Document(collection = "fdkCatalogTurtle")
+data class FDKCatalogTurtle(
     @Id override val id: String,
     override val turtle: String
 ) : TurtleDBO()

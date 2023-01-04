@@ -45,3 +45,11 @@
    dcat:distribution <https://example.org/example-distribusjon>;
    dct:type <https://data.norge.no/vocabulary/event-type#administrative-decision-made>;
    .
+
+<http://test.no/events/0> a cv:Event ;
+  dct:identifier "0" ;
+  dct:title "Test event 0"@en .
+
+<http://test.no/events/1> a cv:BusinessEvent ;
+  dct:identifier "1" ;
+  dct:title "Test event 1"@en .

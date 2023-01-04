@@ -15,7 +15,7 @@ import kotlin.test.assertTrue
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ContextConfiguration(initializers = [ApiTestContext.Initializer::class])
 @Tag("contract")
-class EventServicesTest: ApiTestContext() {
+class CatalogsTest: ApiTestContext() {
 
     @LocalServerPort
     var port: Int = 0
@@ -24,51 +24,51 @@ class EventServicesTest: ApiTestContext() {
 
     @Test
     fun findAllWithRecords() {
-        val response = apiGet(port, "/events?catalogrecords=true", "text/turtle")
+        val response = apiGet(port, "/events/catalogs?catalogrecords=true", "text/turtle")
         Assumptions.assumeTrue(HttpStatus.OK.value() == response["status"])
 
-        val expected = responseReader.parseFile("all_events.ttl", "TURTLE")
+        val expected = responseReader.parseFile("catalog_1.ttl", "TURTLE")
         val responseModel = responseReader.parseResponse(response["body"] as String, "TURTLE")
 
-        assertTrue(checkIfIsomorphicAndPrintDiff(actual = responseModel, expected = expected, name = "ServicesTest.findAll"))
+        assertTrue(checkIfIsomorphicAndPrintDiff(actual = responseModel, expected = expected, name = "CatalogsTest.findAll"))
     }
 
     @Test
     fun findAllNoRecords() {
-        val response = apiGet(port, "/events", "application/trig")
+        val response = apiGet(port, "/events/catalogs", "application/trig")
         Assumptions.assumeTrue(HttpStatus.OK.value() == response["status"])
 
-        val expected = responseReader.parseFile("no_records_all_events.ttl", "TURTLE")
+        val expected = responseReader.parseFile("harvest_response_1.ttl", "TURTLE")
         val responseModel = responseReader.parseResponse(response["body"] as String, Lang.TRIG.name)
 
-        assertTrue(checkIfIsomorphicAndPrintDiff(actual = responseModel, expected = expected, name = "ServicesTest.findAll"))
+        assertTrue(checkIfIsomorphicAndPrintDiff(actual = responseModel, expected = expected, name = "CatalogsTest.findAll"))
     }
 
     @Test
     fun findSpecificWithRecords() {
-        val response = apiGet(port, "/events/$EVENT_ID_0?catalogrecords=true", "application/rdf+json")
+        val response = apiGet(port, "/events/catalogs/$CATALOG_ID_1?catalogrecords=true", "application/rdf+json")
         Assumptions.assumeTrue(HttpStatus.OK.value() == response["status"])
 
-        val expected = responseReader.parseFile("event_0.ttl", "TURTLE")
+        val expected = responseReader.parseFile("catalog_1.ttl", "TURTLE")
         val responseModel = responseReader.parseResponse(response["body"] as String, "RDF/JSON")
 
-        assertTrue(checkIfIsomorphicAndPrintDiff(actual = responseModel, expected = expected, name = "ServicesTest.findSpecific"))
+        assertTrue(checkIfIsomorphicAndPrintDiff(actual = responseModel, expected = expected, name = "CatalogsTest.findSpecific"))
     }
 
     @Test
     fun findSpecificNoRecords() {
-        val response = apiGet(port, "/events/$EVENT_ID_0", "application/trix")
+        val response = apiGet(port, "/events/catalogs/$CATALOG_ID_1", "application/n-quads")
         Assumptions.assumeTrue(HttpStatus.OK.value() == response["status"])
 
-        val expected = responseReader.parseFile("no_records_event_0.ttl", "TURTLE")
-        val responseModel = responseReader.parseResponse(response["body"] as String, Lang.TRIX.name)
+        val expected = responseReader.parseFile("harvest_response_1.ttl", "TURTLE")
+        val responseModel = responseReader.parseResponse(response["body"] as String, Lang.NQUADS.name)
 
-        assertTrue(checkIfIsomorphicAndPrintDiff(actual = responseModel, expected = expected, name = "ServicesTest.findSpecific"))
+        assertTrue(checkIfIsomorphicAndPrintDiff(actual = responseModel, expected = expected, name = "CatalogsTest.findSpecific"))
     }
 
     @Test
     fun idDoesNotExist() {
-        val response = apiGet(port, "/public-services/123", "text/turtle")
+        val response = apiGet(port, "/events/catalogs/123", "text/turtle")
         Assertions.assertEquals(HttpStatus.NOT_FOUND.value(), response["status"])
     }
 

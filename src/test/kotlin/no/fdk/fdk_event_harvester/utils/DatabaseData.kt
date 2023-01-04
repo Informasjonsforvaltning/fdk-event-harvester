@@ -1,7 +1,10 @@
 package no.fdk.fdk_event_harvester.utils
 
+import no.fdk.fdk_event_harvester.model.CatalogMeta
+import no.fdk.fdk_event_harvester.model.CatalogTurtle
 import no.fdk.fdk_event_harvester.model.EventMeta
 import no.fdk.fdk_event_harvester.model.EventTurtle
+import no.fdk.fdk_event_harvester.model.FDKCatalogTurtle
 import no.fdk.fdk_event_harvester.model.FDKEventTurtle
 import no.fdk.fdk_event_harvester.model.HarvestSourceTurtle
 import no.fdk.fdk_event_harvester.model.TurtleDBO
@@ -11,6 +14,24 @@ import org.bson.Document
 
 private val responseReader = TestResponseReader()
 
+
+val CATALOG_META_1 = CatalogMeta(
+    uri="http://test.no/catalogs/0",
+    fdkId=CATALOG_ID_1,
+    events=setOf("http://test.no/events/1", "http://test.no/events/0"),
+    issued = TEST_HARVEST_DATE.timeInMillis,
+    modified = TEST_HARVEST_DATE.timeInMillis
+)
+
+val CATALOG_TURTLE_1 = FDKCatalogTurtle(
+    id = CATALOG_ID_1,
+    turtle = gzip(responseReader.readFile("catalog_1.ttl"))
+)
+
+val CATALOG_TURTLE_1_NO_RECORDS = CatalogTurtle(
+    id = CATALOG_ID_1,
+    turtle = gzip(responseReader.readFile("harvest_response_1.ttl"))
+)
 
 val EVENT_META_0 = EventMeta(
     uri = "http://testdirektoratet.no/events/0",
@@ -68,40 +89,112 @@ val EVENT_TURTLE_2_NO_RECORDS = EventTurtle(
     turtle = gzip(responseReader.readFile("no_records_event_2.ttl"))
 )
 
+val EVENT_META_3 = EventMeta(
+    uri = "http://test.no/events/0",
+    fdkId = EVENT_ID_3,
+    isPartOf = "http://localhost:5000/events/catalogs/$CATALOG_ID_1",
+    issued = TEST_HARVEST_DATE.timeInMillis,
+    modified = TEST_HARVEST_DATE.timeInMillis
+)
+
+
+val EVENT_TURTLE_3 = FDKEventTurtle(
+    id = EVENT_ID_3,
+    turtle = gzip(responseReader.readFile("event_3.ttl"))
+)
+
+
+val EVENT_TURTLE_3_NO_RECORDS = EventTurtle(
+    id = EVENT_ID_3,
+    turtle = gzip(responseReader.readFile("no_records_event_3.ttl"))
+)
+
+val EVENT_META_4 = EventMeta(
+    uri = "http://test.no/events/1",
+    fdkId = EVENT_ID_4,
+    isPartOf = "http://localhost:5000/events/catalogs/$CATALOG_ID_1",
+    issued = TEST_HARVEST_DATE.timeInMillis,
+    modified = TEST_HARVEST_DATE.timeInMillis
+)
+
+
+val EVENT_TURTLE_4 = FDKEventTurtle(
+    id = EVENT_ID_4,
+    turtle = gzip(responseReader.readFile("event_4.ttl"))
+)
+
+
+val EVENT_TURTLE_4_NO_RECORDS = EventTurtle(
+    id = EVENT_ID_4,
+    turtle = gzip(responseReader.readFile("no_records_event_4.ttl"))
+)
+
 val HARVESTED_DBO = HarvestSourceTurtle(
     id = "http://localhost:5000/fdk-public-service-publisher.ttl",
     turtle = gzip(responseReader.readFile("harvest_response_0.ttl"))
 )
 
-val UNION_DATA = FDKEventTurtle(
+val EVENT_UNION_DATA = FDKEventTurtle(
     id = UNION_ID,
     turtle = gzip(responseReader.readFile("all_events.ttl"))
 )
 
-val UNION_DATA_NO_RECORDS = EventTurtle(
+val EVENT_UNION_DATA_NO_RECORDS = EventTurtle(
     id = UNION_ID,
     turtle = gzip(responseReader.readFile("no_records_all_events.ttl"))
+)
+
+val CATALOG_UNION = FDKCatalogTurtle(
+    id = UNION_ID,
+    turtle = gzip(responseReader.readFile("catalog_1.ttl"))
+)
+
+val CATALOG_UNION_NO_RECORDS = CatalogTurtle(
+    id = UNION_ID,
+    turtle = gzip(responseReader.readFile("harvest_response_1.ttl"))
 )
 
 fun harvestSourceTurtlePopulation(): List<Document> =
     listOf(HARVESTED_DBO).map { it.mapDBO() }
 
 fun fdkEventTurtlePopulation(): List<Document> =
-    listOf(UNION_DATA, EVENT_TURTLE_0, EVENT_TURTLE_1, EVENT_TURTLE_2)
+    listOf(EVENT_UNION_DATA, EVENT_TURTLE_0, EVENT_TURTLE_1, EVENT_TURTLE_2, EVENT_TURTLE_3, EVENT_TURTLE_4)
         .map { it.mapDBO() }
 
 fun eventTurtlePopulation(): List<Document> =
-    listOf(EVENT_TURTLE_0_NO_RECORDS, EVENT_TURTLE_1_NO_RECORDS, UNION_DATA_NO_RECORDS, EVENT_TURTLE_2_NO_RECORDS)
+    listOf(EVENT_TURTLE_0_NO_RECORDS, EVENT_TURTLE_1_NO_RECORDS, EVENT_UNION_DATA_NO_RECORDS,
+        EVENT_TURTLE_2_NO_RECORDS, EVENT_TURTLE_3_NO_RECORDS, EVENT_TURTLE_4_NO_RECORDS)
         .map { it.mapDBO() }
 
 fun eventMetaPopulation(): List<Document> =
-    listOf(EVENT_META_0, EVENT_META_1, EVENT_META_2)
+    listOf(EVENT_META_0, EVENT_META_1, EVENT_META_2, EVENT_META_3, EVENT_META_4)
         .map { it.mapDBO() }
+
+fun fdkCatalogTurtlePopulation(): List<Document> =
+    listOf(CATALOG_UNION, CATALOG_TURTLE_1)
+        .map { it.mapDBO() }
+
+fun catalogTurtlePopulation(): List<Document> =
+    listOf(CATALOG_UNION_NO_RECORDS, CATALOG_TURTLE_1_NO_RECORDS)
+        .map { it.mapDBO() }
+
+fun catalogMetaPopulation(): List<Document> =
+    listOf(CATALOG_META_1)
+        .map { it.mapDBO() }
+
+private fun CatalogMeta.mapDBO(): Document =
+    Document()
+        .append("_id", uri)
+        .append("fdkId", fdkId)
+        .append("events", events)
+        .append("issued", issued)
+        .append("modified", modified)
 
 private fun EventMeta.mapDBO(): Document =
     Document()
         .append("_id", uri)
         .append("fdkId", fdkId)
+        .append("isPartOf", isPartOf)
         .append("issued", issued)
         .append("modified", modified)
 

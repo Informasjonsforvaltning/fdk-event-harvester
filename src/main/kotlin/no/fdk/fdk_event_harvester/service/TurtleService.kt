@@ -1,10 +1,14 @@
 package no.fdk.fdk_event_harvester.service
 
+import no.fdk.fdk_event_harvester.model.CatalogTurtle
 import no.fdk.fdk_event_harvester.model.EventTurtle
+import no.fdk.fdk_event_harvester.model.FDKCatalogTurtle
 import no.fdk.fdk_event_harvester.model.FDKEventTurtle
 import no.fdk.fdk_event_harvester.model.HarvestSourceTurtle
 import no.fdk.fdk_event_harvester.rdf.createRDFResponse
+import no.fdk.fdk_event_harvester.repository.CatalogTurtleRepository
 import no.fdk.fdk_event_harvester.repository.EventTurtleRepository
+import no.fdk.fdk_event_harvester.repository.FDKCatalogTurtleRepository
 import no.fdk.fdk_event_harvester.repository.FDKEventTurtleRepository
 import no.fdk.fdk_event_harvester.repository.HarvestSourceTurtleRepository
 import org.apache.jena.rdf.model.Model
@@ -24,15 +28,30 @@ const val UNION_ID = "union-graph"
 class TurtleService(
     private val eventRepository: EventTurtleRepository,
     private val fdkEventRepository: FDKEventTurtleRepository,
+    private val catalogRepository: CatalogTurtleRepository,
+    private val fdkCatalogRepository: FDKCatalogTurtleRepository,
     private val harvestSourceRepository: HarvestSourceTurtleRepository
 ) {
 
-    fun saveAsUnion(model: Model, withRecords: Boolean) {
+    fun saveAsCatalogUnion(model: Model, withRecords: Boolean) {
+        if (withRecords) fdkCatalogRepository.save(model.createFDKCatalogTurtleDBO(UNION_ID))
+        else catalogRepository.save(model.createCatalogTurtleDBO(UNION_ID))
+    }
+
+    fun getCatalogUnion(withRecords: Boolean): String? =
+        if (withRecords) fdkCatalogRepository.findByIdOrNull(UNION_ID)
+            ?.turtle
+            ?.let { ungzip(it) }
+        else catalogRepository.findByIdOrNull(UNION_ID)
+            ?.turtle
+            ?.let { ungzip(it) }
+
+    fun saveAsEventUnion(model: Model, withRecords: Boolean) {
         if (withRecords) fdkEventRepository.save(model.createFDKEventTurtleDBO(UNION_ID))
         else eventRepository.save(model.createEventTurtleDBO(UNION_ID))
     }
 
-    fun getUnion(withRecords: Boolean): String? =
+    fun getEventUnion(withRecords: Boolean): String? =
         if (withRecords) fdkEventRepository.findByIdOrNull(UNION_ID)
             ?.turtle
             ?.let { ungzip(it) }
@@ -50,6 +69,23 @@ class TurtleService(
             ?.turtle
             ?.let { ungzip(it) }
         else eventRepository.findByIdOrNull(fdkId)
+            ?.turtle
+            ?.let { ungzip(it) }
+
+    fun saveAsCatalog(model: Model, fdkId: String, withRecords: Boolean) {
+        if (withRecords) {
+            fdkCatalogRepository.save(model.createFDKCatalogTurtleDBO(fdkId))
+        }
+        else {
+            catalogRepository.save(model.createCatalogTurtleDBO(fdkId))
+        }
+    }
+
+    fun getCatalog(fdkId: String, withRecords: Boolean): String? =
+        if (withRecords) fdkCatalogRepository.findByIdOrNull(fdkId)
+            ?.turtle
+            ?.let { ungzip(it) }
+        else catalogRepository.findByIdOrNull(fdkId)
             ?.turtle
             ?.let { ungzip(it) }
 
@@ -72,6 +108,18 @@ private fun Model.createEventTurtleDBO(id: String): EventTurtle =
 
 private fun Model.createFDKEventTurtleDBO(id: String): FDKEventTurtle =
     FDKEventTurtle(
+        id = id,
+        turtle = gzip(createRDFResponse(Lang.TURTLE))
+    )
+
+private fun Model.createCatalogTurtleDBO(id: String): CatalogTurtle =
+    CatalogTurtle(
+        id = id,
+        turtle = gzip(createRDFResponse(Lang.TURTLE))
+    )
+
+private fun Model.createFDKCatalogTurtleDBO(id: String): FDKCatalogTurtle =
+    FDKCatalogTurtle(
         id = id,
         turtle = gzip(createRDFResponse(Lang.TURTLE))
     )
