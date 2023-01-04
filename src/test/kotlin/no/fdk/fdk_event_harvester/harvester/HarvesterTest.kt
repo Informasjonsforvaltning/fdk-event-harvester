@@ -5,6 +5,7 @@ import no.fdk.fdk_event_harvester.configuration.ApplicationProperties
 import no.fdk.fdk_event_harvester.model.EventMeta
 import no.fdk.fdk_event_harvester.model.FdkIdAndUri
 import no.fdk.fdk_event_harvester.model.HarvestReport
+import no.fdk.fdk_event_harvester.repository.CatalogMetaRepository
 import no.fdk.fdk_event_harvester.repository.EventMetaRepository
 import no.fdk.fdk_event_harvester.service.TurtleService
 import no.fdk.fdk_event_harvester.utils.*
@@ -19,11 +20,12 @@ import java.util.*
 @Tag("unit")
 class HarvesterTest {
     private val metaRepository: EventMetaRepository = mock()
+    private val catalogMetaRepository: CatalogMetaRepository = mock()
     private val turtleService: TurtleService = mock()
     private val valuesMock: ApplicationProperties = mock()
     private val adapter: EventAdapter = mock()
 
-    private val harvester = EventHarvester(adapter, metaRepository, turtleService, valuesMock)
+    private val harvester = EventHarvester(adapter, metaRepository, catalogMetaRepository, turtleService, valuesMock)
     private val responseReader = TestResponseReader()
 
     @Test
@@ -42,23 +44,17 @@ class HarvesterTest {
         }
 
         argumentCaptor<Model, String, Boolean>().apply {
-            verify(turtleService, times(6)).saveAsEvent(first.capture(), second.capture(), third.capture())
+            verify(turtleService, times(3)).saveAsEvent(first.capture(), second.capture(), third.capture())
             val index0 = second.allValues.indexOf(EVENT_ID_0)
-            assertEquals(second.allValues[index0 + 1], EVENT_ID_0)
             assertTrue(checkIfIsomorphicAndPrintDiff(first.allValues[index0], responseReader.parseFile("no_records_event_0.ttl", "TURTLE"), "harvestDataSourceSavedWhenDBIsEmpty-norecords0"))
-            assertTrue(checkIfIsomorphicAndPrintDiff(first.allValues[index0 + 1], responseReader.parseFile("event_0.ttl", "TURTLE"), "harvestDataSourceSavedWhenDBIsEmpty-0"))
 
             val index1 = second.allValues.indexOf(EVENT_ID_1)
-            assertEquals(second.allValues[index1 + 1], EVENT_ID_1)
             assertTrue(checkIfIsomorphicAndPrintDiff(first.allValues[index1], responseReader.parseFile("no_records_event_1.ttl", "TURTLE"), "harvestDataSourceSavedWhenDBIsEmpty-norecords1"))
-            assertTrue(checkIfIsomorphicAndPrintDiff(first.allValues[index1 + 1], responseReader.parseFile("event_1.ttl", "TURTLE"), "harvestDataSourceSavedWhenDBIsEmpty-1"))
 
             val index2 = second.allValues.indexOf(EVENT_ID_2)
-            assertEquals(second.allValues[index2 + 1], EVENT_ID_2)
             assertTrue(checkIfIsomorphicAndPrintDiff(first.allValues[index2], responseReader.parseFile("no_records_event_2.ttl", "TURTLE"), "harvestDataSourceSavedWhenDBIsEmpty-norecords2"))
-            assertTrue(checkIfIsomorphicAndPrintDiff(first.allValues[index2 + 1], responseReader.parseFile("event_2.ttl", "TURTLE"), "harvestDataSourceSavedWhenDBIsEmpty-2"))
 
-            assertEquals(listOf(false, true, false, true, false, true), third.allValues)
+            assertEquals(listOf(false, false, false), third.allValues)
         }
 
         argumentCaptor<EventMeta>().apply {
@@ -123,7 +119,7 @@ class HarvesterTest {
         val report = harvester.harvestEvents(TEST_HARVEST_SOURCE, TEST_HARVEST_DATE, true)
 
         verify(turtleService, times(1)).saveAsHarvestSource(any(), any())
-        verify(turtleService, times(6)).saveAsEvent(any(), any(), any())
+        verify(turtleService, times(3)).saveAsEvent(any(), any(), any())
         verify(metaRepository, times(3)).save(any())
 
         val expectedReport = HarvestReport(
@@ -172,11 +168,10 @@ class HarvesterTest {
         }
 
         argumentCaptor<Model, String, Boolean>().apply {
-            verify(turtleService, times(2)).saveAsEvent(first.capture(), second.capture(), third.capture())
+            verify(turtleService, times(1)).saveAsEvent(first.capture(), second.capture(), third.capture())
             assertTrue(checkIfIsomorphicAndPrintDiff(first.allValues[0], responseReader.parseFile("no_records_event_1.ttl", "TURTLE"), "onlyRelevantUpdatedWhenHarvestedFromDB-norecords1"))
-            assertTrue(checkIfIsomorphicAndPrintDiff(first.allValues[1], responseReader.parseFile("event_1_modified.ttl", "TURTLE"), "onlyRelevantUpdatedWhenHarvestedFromDB-1"))
-            assertEquals(listOf(EVENT_ID_1, EVENT_ID_1), second.allValues)
-            assertEquals(listOf(false, true), third.allValues)
+            assertEquals(listOf(EVENT_ID_1), second.allValues)
+            assertEquals(listOf(false), third.allValues)
         }
 
         argumentCaptor<EventMeta>().apply {
@@ -221,6 +216,42 @@ class HarvesterTest {
         )
 
         kotlin.test.assertEquals(expectedReport, report)
+    }
+
+    @Test
+    fun harvestDataSourceWithCatalog() {
+        whenever(adapter.getEvents(TEST_HARVEST_SOURCE))
+            .thenReturn(responseReader.readFile("harvest_response_1.ttl"))
+        whenever(valuesMock.eventsUri)
+            .thenReturn("http://localhost:5000/events")
+
+        val report = harvester.harvestEvents(TEST_HARVEST_SOURCE, TEST_HARVEST_DATE, false)
+
+        argumentCaptor<Model, String>().apply {
+            verify(turtleService, times(1)).saveAsHarvestSource(first.capture(), second.capture())
+            assertTrue(first.firstValue.isIsomorphicWith(responseReader.parseFile("harvest_response_1.ttl", "TURTLE")))
+            assertEquals(TEST_HARVEST_SOURCE.url, second.firstValue)
+        }
+
+        verify(turtleService, times(2)).saveAsEvent(any(), any(), any())
+        verify(turtleService, times(1)).saveAsCatalog(any(), any(), any())
+        verify(metaRepository, times(2)).save(any())
+        verify(catalogMetaRepository, times(1)).save(any())
+
+        val expectedReport = HarvestReport(
+            id="test-source",
+            url="http://localhost:5000/fdk-public-service-publisher.ttl",
+            dataType="event",
+            harvestError=false,
+            startTime = "2020-10-05 15:15:39 +0200",
+            endTime = report!!.endTime,
+            changedCatalogs=listOf(FdkIdAndUri(fdkId=CATALOG_ID_1, uri="http://test.no/catalogs/0")),
+            changedResources = listOf(
+                FdkIdAndUri(fdkId=EVENT_ID_3, uri="http://test.no/events/0"),
+                FdkIdAndUri(fdkId=EVENT_ID_4, uri="http://test.no/events/1"))
+        )
+
+        assertEquals(expectedReport, report)
     }
 
 }

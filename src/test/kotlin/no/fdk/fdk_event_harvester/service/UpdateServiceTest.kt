@@ -1,6 +1,7 @@
 package no.fdk.fdk_event_harvester.service
 
 import no.fdk.fdk_event_harvester.configuration.ApplicationProperties
+import no.fdk.fdk_event_harvester.repository.CatalogMetaRepository
 import no.fdk.fdk_event_harvester.repository.EventMetaRepository
 import no.fdk.fdk_event_harvester.utils.*
 import org.apache.jena.rdf.model.Model
@@ -14,9 +15,10 @@ import org.mockito.kotlin.*
 @Tag("unit")
 class UpdateServiceTest {
     private val metaRepository: EventMetaRepository = mock()
+    private val catalogMetaRepository: CatalogMetaRepository = mock()
     private val valuesMock: ApplicationProperties = mock()
     private val turtleService: TurtleService = mock()
-    private val updateService = UpdateService(valuesMock, metaRepository, turtleService)
+    private val updateService = UpdateService(valuesMock, metaRepository, catalogMetaRepository, turtleService)
 
     private val responseReader = TestResponseReader()
 
@@ -56,7 +58,9 @@ class UpdateServiceTest {
         @Test
         fun updateUnionModel() {
             whenever(metaRepository.findAll())
-                .thenReturn(listOf(EVENT_META_0, EVENT_META_1, EVENT_META_2))
+                .thenReturn(listOf(EVENT_META_0, EVENT_META_1, EVENT_META_2, EVENT_META_3, EVENT_META_4))
+            whenever(catalogMetaRepository.findAll())
+                .thenReturn(listOf(CATALOG_META_1))
 
             whenever(turtleService.getEvent(EVENT_ID_0, true))
                 .thenReturn(responseReader.readFile("event_0.ttl"))
@@ -64,6 +68,10 @@ class UpdateServiceTest {
                 .thenReturn(responseReader.readFile("event_1.ttl"))
             whenever(turtleService.getEvent(EVENT_ID_2, true))
                 .thenReturn(responseReader.readFile("event_2.ttl"))
+            whenever(turtleService.getEvent(EVENT_ID_3, true))
+                .thenReturn(responseReader.readFile("event_3.ttl"))
+            whenever(turtleService.getEvent(EVENT_ID_4, true))
+                .thenReturn(responseReader.readFile("event_4.ttl"))
 
             whenever(turtleService.getEvent(EVENT_ID_0, false))
                 .thenReturn(responseReader.readFile("no_records_event_0.ttl"))
@@ -71,18 +79,29 @@ class UpdateServiceTest {
                 .thenReturn(responseReader.readFile("no_records_event_1.ttl"))
             whenever(turtleService.getEvent(EVENT_ID_2, false))
                 .thenReturn(responseReader.readFile("no_records_event_2.ttl"))
+            whenever(turtleService.getEvent(EVENT_ID_3, false))
+                .thenReturn(responseReader.readFile("no_records_event_3.ttl"))
+            whenever(turtleService.getEvent(EVENT_ID_4, false))
+                .thenReturn(responseReader.readFile("no_records_event_4.ttl"))
 
-            updateService.updateUnionModel()
+            whenever(turtleService.getCatalog(CATALOG_ID_1, true))
+                .thenReturn(responseReader.readFile("catalog_1.ttl"))
+            whenever(turtleService.getCatalog(CATALOG_ID_1, false))
+                .thenReturn(responseReader.readFile("harvest_response_1.ttl"))
+
+            updateService.updateUnionModels()
 
             val expected = responseReader.parseFile("all_events.ttl", "TURTLE")
             val expectedNoRecords = responseReader.parseFile("no_records_all_events.ttl", "TURTLE")
 
             argumentCaptor<Model, Boolean>().apply {
-                verify(turtleService, times(2)).saveAsUnion(first.capture(), second.capture())
+                verify(turtleService, times(2)).saveAsEventUnion(first.capture(), second.capture())
                 assertTrue(checkIfIsomorphicAndPrintDiff(first.firstValue, expected, "updateUnionModel-witchrecords"))
                 assertTrue(checkIfIsomorphicAndPrintDiff(first.secondValue, expectedNoRecords, "updateUnionModel-norecords"))
                 assertEquals(listOf(true, false), second.allValues)
             }
+
+            verify(turtleService, times(2)).saveAsCatalogUnion(any(), any())
         }
     }
 }

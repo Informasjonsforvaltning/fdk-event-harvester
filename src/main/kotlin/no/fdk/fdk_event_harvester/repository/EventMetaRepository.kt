@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface EventMetaRepository : MongoRepository<EventMeta, String> {
-    fun findOneByFdkId(fdkId: String): EventMeta?
+    fun findAllByIsPartOf(isPartOf: String): List<EventMeta>
 }

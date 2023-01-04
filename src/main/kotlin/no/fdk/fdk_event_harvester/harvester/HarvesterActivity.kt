@@ -46,7 +46,7 @@ class HarvesterActivity(
                         .map { async { harvester.harvestEvents(it, Calendar.getInstance(), forceUpdate) } }
                         .awaitAll()
                         .filterNotNull()
-                        .also { updateService.updateUnionModel() }
+                        .also { updateService.updateMetaData() }
                         .also {
                             if (params.harvestAllEvents()) LOGGER.debug("completed harvest with parameters $params, force update: $forceUpdate")
                             else LOGGER.debug("completed harvest of all catalogs, force update: $forceUpdate")

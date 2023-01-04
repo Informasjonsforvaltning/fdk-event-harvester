@@ -34,3 +34,13 @@ class CV {
     }
 
 }
+
+class DCATNO {
+
+    companion object {
+        private val m = ModelFactory.createDefaultModel()
+        const val uri = "https://data.norge.no/vocabulary/dcatno#"
+        val containsEvent: Property = m.createProperty("${uri}containsEvent")
+    }
+
+}

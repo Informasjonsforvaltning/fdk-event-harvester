@@ -104,6 +104,15 @@ fun populateDB() {
     val eventMetaCollection = mongoDatabase.getCollection("eventMeta")
     eventMetaCollection.insertMany(eventMetaPopulation())
 
+    val catalogTurtleCollection = mongoDatabase.getCollection("catalogTurtle")
+    catalogTurtleCollection.insertMany(catalogTurtlePopulation())
+
+    val fdkCatalogTurtleCollection = mongoDatabase.getCollection("fdkCatalogTurtle")
+    fdkCatalogTurtleCollection.insertMany(fdkCatalogTurtlePopulation())
+
+    val catalogMetaCollection = mongoDatabase.getCollection("catalogMeta")
+    catalogMetaCollection.insertMany(catalogMetaPopulation())
+
     client.close()
 }
 

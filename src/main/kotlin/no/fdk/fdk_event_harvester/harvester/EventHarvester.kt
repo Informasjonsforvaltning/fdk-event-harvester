@@ -7,12 +7,7 @@ import no.fdk.fdk_event_harvester.rdf.*
 import no.fdk.fdk_event_harvester.repository.*
 import no.fdk.fdk_event_harvester.service.*
 import org.apache.jena.rdf.model.Model
-import org.apache.jena.rdf.model.ModelFactory
 import org.apache.jena.riot.Lang
-import org.apache.jena.sparql.vocabulary.FOAF
-import org.apache.jena.vocabulary.DCAT
-import org.apache.jena.vocabulary.DCTerms
-import org.apache.jena.vocabulary.RDF
 import org.slf4j.LoggerFactory
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -27,7 +22,8 @@ private const val dateFormat: String = "yyyy-MM-dd HH:mm:ss Z"
 @Service
 class EventHarvester(
     private val adapter: EventAdapter,
-    private val metaRepository: EventMetaRepository,
+    private val eventMetaRepository: EventMetaRepository,
+    private val catalogMetaRepository: CatalogMetaRepository,
     private val turtleService: TurtleService,
     private val applicationProperties: ApplicationProperties
 ) {
@@ -110,41 +106,87 @@ class EventHarvester(
     }
 
     private fun updateDB(harvested: Model, sourceId: String, sourceURL: String, harvestDate: Calendar, forceUpdate: Boolean): HarvestReport {
-        val updatedEvents = mutableListOf<EventMeta>()
-        splitEventsFromRDF(harvested, sourceURL)
-            .map { Pair(it, metaRepository.findByIdOrNull(it.eventURI)) }
-            .filter { forceUpdate || it.first.eventHasChanges(it.second?.fdkId) }
-            .forEach {
-                val updatedMeta = it.first.updateMeta(harvestDate, it.second)
-                metaRepository.save(updatedMeta)
+        val allEvents = splitEventsFromRDF(harvested, sourceURL)
+        return if (allEvents.isEmpty()) {
+            LOGGER.warn("No events found in data harvested from $sourceURL")
+            HarvestReport(
+                id = sourceId,
+                url = sourceURL,
+                harvestError = true,
+                errorMessage = "No events found in data harvested from $sourceURL",
+                startTime = harvestDate.formatWithOsloTimeZone(),
+                endTime = formatNowWithOsloTimeZone()
+            )
+        } else {
+            val updatedEvents = updateEvents(allEvents, harvestDate, forceUpdate)
 
-                turtleService.saveAsEvent(it.first.harvested, updatedMeta.fdkId, false)
+            val catalogs = splitCatalogsFromRDF(harvested, allEvents, sourceURL)
+            val updatedCatalogs = updateCatalogs(catalogs, harvestDate, forceUpdate)
 
-                val fdkUri = "${applicationProperties.eventsUri}/${updatedMeta.fdkId}"
+            return HarvestReport(
+                id = sourceId,
+                url = sourceURL,
+                harvestError = false,
+                startTime = harvestDate.formatWithOsloTimeZone(),
+                endTime = formatNowWithOsloTimeZone(),
+                changedCatalogs = updatedCatalogs,
+                changedResources = updatedEvents
+            )
+        }
+    }
 
-                val metaModel = ModelFactory.createDefaultModel()
-                metaModel.createResource(fdkUri)
-                    .addProperty(RDF.type, DCAT.CatalogRecord)
-                    .addProperty(DCTerms.identifier, updatedMeta.fdkId)
-                    .addProperty(FOAF.primaryTopic, metaModel.createResource(updatedMeta.uri))
-                    .addProperty(DCTerms.issued, metaModel.createTypedLiteral(calendarFromTimestamp(updatedMeta.issued)))
-                    .addProperty(DCTerms.modified, metaModel.createTypedLiteral(harvestDate))
+    private fun updateCatalogs(catalogs: List<CatalogRDFModel>, harvestDate: Calendar, forceUpdate: Boolean): List<FdkIdAndUri> =
+        catalogs
+            .map { Pair(it, catalogMetaRepository.findByIdOrNull(it.resourceURI)) }
+            .filter { forceUpdate || it.first.hasChanges(it.second?.fdkId) }
+            .map {
+                val updatedMeta = it.first.mapToMetaDBO(harvestDate, it.second)
+                catalogMetaRepository.save(updatedMeta)
 
-                turtleService.saveAsEvent(metaModel.union(it.first.harvested), updatedMeta.fdkId, true)
-                updatedEvents.add(updatedMeta)
+                turtleService.saveAsCatalog(
+                    model = it.first.harvested,
+                    fdkId = updatedMeta.fdkId,
+                    withRecords = false
+                )
+
+                val fdkUri = "${applicationProperties.eventsUri}/catalogs/${updatedMeta.fdkId}"
+                it.first.events.forEach { eventURI -> addIsPartOfToEvents(eventURI, fdkUri) }
+
+                FdkIdAndUri(fdkId = updatedMeta.fdkId, uri = updatedMeta.uri)
             }
-        LOGGER.debug("Harvest of $sourceURL completed")
-        return HarvestReport(
-            id = sourceId,
-            url = sourceURL,
-            harvestError = false,
-            startTime = harvestDate.formatWithOsloTimeZone(),
-            endTime = formatNowWithOsloTimeZone(),
-            changedResources = updatedEvents.map { FdkIdAndUri(fdkId = it.fdkId, uri = it.uri) }
+
+    private fun CatalogRDFModel.mapToMetaDBO(
+        harvestDate: Calendar,
+        dbMeta: CatalogMeta?
+    ): CatalogMeta {
+        val catalogURI = resourceURI
+        val fdkId = dbMeta?.fdkId ?: createIdFromUri(catalogURI)
+        val issued = dbMeta?.issued
+            ?.let { timestamp -> calendarFromTimestamp(timestamp) }
+            ?: harvestDate
+
+        return CatalogMeta(
+            uri = catalogURI,
+            fdkId = fdkId,
+            issued = issued.timeInMillis,
+            modified = harvestDate.timeInMillis,
+            events = events
         )
     }
 
-    private fun EventRDFModel.updateMeta(
+    private fun updateEvents(events: List<EventRDFModel>, harvestDate: Calendar, forceUpdate: Boolean): List<FdkIdAndUri> =
+        events
+            .map { Pair(it, eventMetaRepository.findByIdOrNull(it.eventURI)) }
+            .filter { forceUpdate || it.first.hasChanges(it.second?.fdkId) }
+            .map {
+                val updatedMeta = it.first.mapToMetaDBO(harvestDate, it.second)
+                eventMetaRepository.save(updatedMeta)
+                turtleService.saveAsEvent(it.first.harvested, updatedMeta.fdkId, false)
+
+                FdkIdAndUri(fdkId = updatedMeta.fdkId, uri = it.first.eventURI)
+            }
+
+    private fun EventRDFModel.mapToMetaDBO(
         harvestDate: Calendar,
         dbMeta: EventMeta?
     ): EventMeta {
@@ -161,7 +203,15 @@ class EventHarvester(
         )
     }
 
-    private fun EventRDFModel.eventHasChanges(fdkId: String?): Boolean =
+    private fun addIsPartOfToEvents(eventURI: String, catalogURI: String) =
+        eventMetaRepository.findByIdOrNull(eventURI)
+            ?.run { eventMetaRepository.save(copy(isPartOf = catalogURI)) }
+
+    private fun CatalogRDFModel.hasChanges(fdkId: String?): Boolean =
+        if (fdkId == null) true
+        else harvestDiff(turtleService.getCatalog(fdkId, withRecords = false))
+
+    private fun EventRDFModel.hasChanges(fdkId: String?): Boolean =
         if (fdkId == null) true
         else harvestDiff(turtleService.getEvent(fdkId, withRecords = false))
 
