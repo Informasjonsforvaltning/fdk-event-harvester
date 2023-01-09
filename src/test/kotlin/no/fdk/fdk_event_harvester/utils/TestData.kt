@@ -16,6 +16,7 @@ val MONGO_ENV_VALUES: Map<String, String> = ImmutableMap.of(
     "MONGO_INITDB_ROOT_PASSWORD", MONGO_PASSWORD
 )
 
+const val CATALOG_ID_0 = "4d2c9e29-2f9a-304f-9e48-34e30a36d068"
 const val CATALOG_ID_1 = "b7c6d34c-624d-3c72-9e30-2b608e433ad7"
 
 const val EVENT_ID_0 = "cbed84c4-a719-3370-b216-725bfc79978d"

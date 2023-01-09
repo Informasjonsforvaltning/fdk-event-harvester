@@ -15,6 +15,24 @@ import org.bson.Document
 private val responseReader = TestResponseReader()
 
 
+val CATALOG_META_0 = CatalogMeta(
+    uri="http://localhost:5000/fdk-public-service-publisher.ttl#GeneratedCatalog",
+    fdkId=CATALOG_ID_0,
+    events=setOf("http://testdirektoratet.no/events/0", "http://testdirektoratet.no/events/2", "http://testdirektoratet.no/events/1"),
+    issued = TEST_HARVEST_DATE.timeInMillis,
+    modified = TEST_HARVEST_DATE.timeInMillis
+)
+
+val CATALOG_TURTLE_0 = FDKCatalogTurtle(
+    id = CATALOG_ID_0,
+    turtle = gzip(responseReader.readFile("catalog_0.ttl"))
+)
+
+val CATALOG_TURTLE_0_NO_RECORDS = CatalogTurtle(
+    id = CATALOG_ID_0,
+    turtle = gzip(responseReader.readFile("no_records_catalog_0.ttl"))
+)
+
 val CATALOG_META_1 = CatalogMeta(
     uri="http://test.no/catalogs/0",
     fdkId=CATALOG_ID_1,
@@ -36,6 +54,7 @@ val CATALOG_TURTLE_1_NO_RECORDS = CatalogTurtle(
 val EVENT_META_0 = EventMeta(
     uri = "http://testdirektoratet.no/events/0",
     fdkId = EVENT_ID_0,
+    isPartOf = "http://localhost:5000/events/catalogs/$CATALOG_ID_0",
     issued = TEST_HARVEST_DATE.timeInMillis,
     modified = TEST_HARVEST_DATE.timeInMillis
 )
@@ -56,6 +75,7 @@ val EVENT_TURTLE_0_NO_RECORDS = EventTurtle(
 val EVENT_META_1 = EventMeta(
     uri = "http://testdirektoratet.no/events/1",
     fdkId = EVENT_ID_1,
+    isPartOf = "http://localhost:5000/events/catalogs/$CATALOG_ID_0",
     issued = TEST_HARVEST_DATE.timeInMillis,
     modified = TEST_HARVEST_DATE.timeInMillis
 )
@@ -73,6 +93,7 @@ val EVENT_TURTLE_1_NO_RECORDS = EventTurtle(
 val EVENT_META_2 = EventMeta(
     uri = "http://testdirektoratet.no/events/2",
     fdkId = EVENT_ID_2,
+    isPartOf = "http://localhost:5000/events/catalogs/$CATALOG_ID_0",
     issued = TEST_HARVEST_DATE.timeInMillis,
     modified = TEST_HARVEST_DATE.timeInMillis
 )
@@ -146,12 +167,12 @@ val EVENT_UNION_DATA_NO_RECORDS = EventTurtle(
 
 val CATALOG_UNION = FDKCatalogTurtle(
     id = UNION_ID,
-    turtle = gzip(responseReader.readFile("catalog_1.ttl"))
+    turtle = gzip(responseReader.readFile("all_catalogs.ttl"))
 )
 
 val CATALOG_UNION_NO_RECORDS = CatalogTurtle(
     id = UNION_ID,
-    turtle = gzip(responseReader.readFile("harvest_response_1.ttl"))
+    turtle = gzip(responseReader.readFile("no_records_all_catalogs.ttl"))
 )
 
 fun harvestSourceTurtlePopulation(): List<Document> =
@@ -171,15 +192,15 @@ fun eventMetaPopulation(): List<Document> =
         .map { it.mapDBO() }
 
 fun fdkCatalogTurtlePopulation(): List<Document> =
-    listOf(CATALOG_UNION, CATALOG_TURTLE_1)
+    listOf(CATALOG_UNION, CATALOG_TURTLE_0, CATALOG_TURTLE_1)
         .map { it.mapDBO() }
 
 fun catalogTurtlePopulation(): List<Document> =
-    listOf(CATALOG_UNION_NO_RECORDS, CATALOG_TURTLE_1_NO_RECORDS)
+    listOf(CATALOG_UNION_NO_RECORDS, CATALOG_TURTLE_0_NO_RECORDS, CATALOG_TURTLE_1_NO_RECORDS)
         .map { it.mapDBO() }
 
 fun catalogMetaPopulation(): List<Document> =
-    listOf(CATALOG_META_1)
+    listOf(CATALOG_META_0, CATALOG_META_1)
         .map { it.mapDBO() }
 
 private fun CatalogMeta.mapDBO(): Document =

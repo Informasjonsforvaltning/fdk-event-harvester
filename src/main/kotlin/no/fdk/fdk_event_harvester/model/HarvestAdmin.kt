@@ -8,6 +8,7 @@ data class HarvestDataSource (
     val dataSourceType: String? = null,
     val dataType: String? = null,
     val url: String? = null,
+    val publisherId: String? = null,
     val acceptHeaderValue: String? = null
 )
 

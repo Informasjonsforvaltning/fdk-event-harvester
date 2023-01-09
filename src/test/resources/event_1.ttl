@@ -24,6 +24,7 @@
 <http://localhost:5000/events/99b00c6c-4087-3c23-9244-6e85b9d02adc>
         a                  dcat:CatalogRecord ;
         dct:identifier     "99b00c6c-4087-3c23-9244-6e85b9d02adc" ;
+        dct:isPartOf       <http://localhost:5000/events/catalogs/4d2c9e29-2f9a-304f-9e48-34e30a36d068> ;
         dct:issued         "2020-10-05T13:15:39.831Z"^^xsd:dateTime ;
         dct:modified       "2020-10-05T13:15:39.831Z"^^xsd:dateTime ;
         foaf:primaryTopic  <http://testdirektoratet.no/events/1> .
