@@ -1,0 +1,81 @@
+@prefix cpsv:   <http://purl.org/vocab/cpsv#> .
+@prefix cpsvno: <https://data.norge.no/vocabulary/cpsvno#> .
+@prefix dcatno: <https://data.norge.no/vocabulary/dcatno#> .
+@prefix cv:     <http://data.europa.eu/m8g/> .
+@prefix dcat:   <http://www.w3.org/ns/dcat#> .
+@prefix dct:    <http://purl.org/dc/terms/> .
+@prefix eli:    <http://data.europa.eu/eli/ontology#> .
+@prefix foaf:   <http://xmlns.com/foaf/0.1/> .
+@prefix schema: <http://schema.org/> .
+@prefix skos:   <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
+
+<http://testdirektoratet.no/events/1>
+        a                         cv:LifeEvent ;
+        cv:hasCompetentAuthority  <https://data.brreg.no/enhetsregisteret/api/enheter/983887457> ;
+        dct:description           "ASD forvalter i dag flere ordninger i folketrygdloven med relevans for livshendelsen. Direktoratet forvalter også ordninger som tilhører BFD. I forbindelse med direktoratets langsiktige IKT-moderniseringsarbeid er det innført digitale tjenester for innsyn, dialog, samhandling og automatisert saksbehandling for foreldrepenger og pleiepenger. Dette digitaliseringsarbeidet understøtter målsettingene i digitaliseringsstrategien."@nb ;
+        dct:identifier            "1" ;
+        dct:relation              <http://public-service-publisher.fellesdatakatalog.digdir.no/services/13> ;
+        dct:title                 "Få barn"@nb ;
+        dct:type                  <https://data.norge.no/concepts/304> .
+
+<https://data.norge.no/concepts/300>
+        a               skos:Concept ;
+        skos:prefLabel  "Starte og drive en bedrift"@nb , "Starting business"@en .
+
+<http://testdirektoratet.no/events/2>
+        a                   cv:Event ;
+        dct:description     "Teksten blir vist på nynorsk."@nn , "Det er fattet vedtak om å gi skjenkebevilling til «Den beste restauranten AS», for servering av alkoholholdig drikk i gruppe 1, jf. Alkoholloven § 4-2"@nb , "The text is displayed in English."@en ;
+        dct:identifier      "https://raw.githubusercontent.com/Informasjonsforvaltning/cpsv-ap-no/develop/examples/exHendelse.ttl"^^xsd:anyURI ;
+        dct:subject         <https://data.norge.no/concepts/ad2ab3f9-17a1-4494-b15e-4ba3967a6424> ;
+        dct:title           "Vedtak om skjenkebevilling"@nb ;
+        dct:type            <https://data.norge.no/vocabulary/event-type#administrative-decision-made> ;
+        dcat:distribution   <https://example.org/example-distribusjon> ;
+        cpsvno:mayInitiate  <https://raw.githubusercontent.com/Informasjonsforvaltning/cpsv-ap-no/develop/examples/exTjenesteDummy.ttl> .
+
+<http://testdirektoratet.no/events/0>
+        a                cv:BusinessEvent ;
+        dct:description  "Elektronisk prosess for etablering og oppstart av en bedrift."@nb ;
+        dct:identifier   "1" ;
+        dct:relation     <http://public-service-publisher.fellesdatakatalog.digdir.no/services/5> , <http://public-service-publisher.fellesdatakatalog.digdir.no/services/6> , <http://public-service-publisher.fellesdatakatalog.digdir.no/services/3> , <http://public-service-publisher.fellesdatakatalog.digdir.no/services/4> , <http://public-service-publisher.fellesdatakatalog.digdir.no/services/1> , <http://public-service-publisher.fellesdatakatalog.digdir.no/services/2> ;
+        dct:title        "Starte og drive restaurant"@nb ;
+        dct:type         <https://data.norge.no/concepts/300> .
+
+<http://localhost:5000/fdk-public-service-publisher.ttl#GeneratedCatalog>
+        a       dcat:Catalog ;
+        dcatno:containsEvent <http://testdirektoratet.no/events/2> , <http://testdirektoratet.no/events/0> , <http://testdirektoratet.no/events/1> .
+
+<https://data.norge.no/concepts/304>
+        a               skos:Concept ;
+        skos:prefLabel  "Having a child"@en , "Få barn"@nb .
+
+<http://localhost:5000/events/catalogs/4d2c9e29-2f9a-304f-9e48-34e30a36d068>
+  a               dcat:CatalogRecord ;
+  dct:identifier  "4d2c9e29-2f9a-304f-9e48-34e30a36d068" ;
+  dct:issued         "2020-10-05T13:15:39.831Z"^^xsd:dateTime ;
+  dct:modified       "2020-10-05T13:15:39.831Z"^^xsd:dateTime ;
+  foaf:primaryTopic <http://localhost:5000/fdk-public-service-publisher.ttl#GeneratedCatalog> .
+
+<http://localhost:5000/events/cbed84c4-a719-3370-b216-725bfc79978d>
+        a                  dcat:CatalogRecord ;
+        dct:identifier     "cbed84c4-a719-3370-b216-725bfc79978d" ;
+        dct:isPartOf       <http://localhost:5000/events/catalogs/4d2c9e29-2f9a-304f-9e48-34e30a36d068> ;
+        dct:issued         "2020-10-05T13:15:39.831Z"^^xsd:dateTime ;
+        dct:modified       "2020-10-05T13:15:39.831Z"^^xsd:dateTime ;
+        foaf:primaryTopic  <http://testdirektoratet.no/events/0> .
+
+<http://localhost:5000/events/99b00c6c-4087-3c23-9244-6e85b9d02adc>
+        a                  dcat:CatalogRecord ;
+        dct:identifier     "99b00c6c-4087-3c23-9244-6e85b9d02adc" ;
+        dct:isPartOf       <http://localhost:5000/events/catalogs/4d2c9e29-2f9a-304f-9e48-34e30a36d068> ;
+        dct:issued         "2020-10-05T13:15:39.831Z"^^xsd:dateTime ;
+        dct:modified       "2020-10-05T13:15:39.831Z"^^xsd:dateTime ;
+        foaf:primaryTopic  <http://testdirektoratet.no/events/1> .
+
+<http://localhost:5000/events/fb77d4f2-a11c-33e3-8c49-772c4569613b>
+        a                  dcat:CatalogRecord ;
+        dct:identifier     "fb77d4f2-a11c-33e3-8c49-772c4569613b" ;
+        dct:isPartOf       <http://localhost:5000/events/catalogs/4d2c9e29-2f9a-304f-9e48-34e30a36d068> ;
+        dct:issued         "2020-10-05T13:15:39.831Z"^^xsd:dateTime ;
+        dct:modified       "2020-10-05T13:15:39.831Z"^^xsd:dateTime ;
+        foaf:primaryTopic  <http://testdirektoratet.no/events/2> .

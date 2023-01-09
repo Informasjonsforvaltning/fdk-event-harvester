@@ -2,6 +2,7 @@ package no.fdk.fdk_event_harvester.harvester
 
 import no.fdk.fdk_event_harvester.configuration.ApplicationProperties
 import no.fdk.fdk_event_harvester.adapter.EventAdapter
+import no.fdk.fdk_event_harvester.adapter.OrganizationsAdapter
 import no.fdk.fdk_event_harvester.model.*
 import no.fdk.fdk_event_harvester.rdf.*
 import no.fdk.fdk_event_harvester.repository.*
@@ -22,6 +23,7 @@ private const val dateFormat: String = "yyyy-MM-dd HH:mm:ss Z"
 @Service
 class EventHarvester(
     private val adapter: EventAdapter,
+    private val orgAdapter: OrganizationsAdapter,
     private val eventMetaRepository: EventMetaRepository,
     private val catalogMetaRepository: CatalogMetaRepository,
     private val turtleService: TurtleService,
@@ -65,7 +67,7 @@ class EventHarvester(
                     }
                     else -> updateIfChanged(
                         parseRDFResponse(adapter.getEvents(source), jenaWriterType, source.url),
-                        source.id, source.url, harvestDate, forceUpdate
+                        source.id, source.url, harvestDate, source.publisherId, forceUpdate
                     )
                 }
             } catch (ex: Exception) {
@@ -84,7 +86,8 @@ class EventHarvester(
             null
         }
 
-    private fun updateIfChanged(harvested: Model, sourceId: String, sourceURL: String, harvestDate: Calendar, forceUpdate: Boolean): HarvestReport {
+    private fun updateIfChanged(harvested: Model, sourceId: String, sourceURL: String, harvestDate: Calendar,
+                                publisherId: String?, forceUpdate: Boolean): HarvestReport {
         val dbData = turtleService.getHarvestSource(sourceURL)
             ?.let { parseRDFResponse(it, Lang.TURTLE, null) }
 
@@ -101,11 +104,12 @@ class EventHarvester(
             LOGGER.info("Changes detected, saving data from $sourceURL, and updating FDK meta data")
             turtleService.saveAsHarvestSource(harvested, sourceURL)
 
-            updateDB(harvested, sourceId, sourceURL, harvestDate, forceUpdate)
+            updateDB(harvested, sourceId, sourceURL, harvestDate, publisherId, forceUpdate)
         }
     }
 
-    private fun updateDB(harvested: Model, sourceId: String, sourceURL: String, harvestDate: Calendar, forceUpdate: Boolean): HarvestReport {
+    private fun updateDB(harvested: Model, sourceId: String, sourceURL: String, harvestDate: Calendar,
+                         publisherId: String?, forceUpdate: Boolean): HarvestReport {
         val allEvents = splitEventsFromRDF(harvested, sourceURL)
         return if (allEvents.isEmpty()) {
             LOGGER.warn("No events found in data harvested from $sourceURL")
@@ -120,7 +124,11 @@ class EventHarvester(
         } else {
             val updatedEvents = updateEvents(allEvents, harvestDate, forceUpdate)
 
-            val catalogs = splitCatalogsFromRDF(harvested, allEvents, sourceURL)
+            val organization = if (publisherId != null && allEvents.containsFreeServices()) {
+                orgAdapter.getOrganization(publisherId)
+            } else null
+
+            val catalogs = splitCatalogsFromRDF(harvested, allEvents, sourceURL, organization)
             val updatedCatalogs = updateCatalogs(catalogs, harvestDate, forceUpdate)
 
             return HarvestReport(
@@ -198,6 +206,7 @@ class EventHarvester(
         return EventMeta(
             uri = eventURI,
             fdkId = fdkId,
+            isPartOf = dbMeta?.isPartOf,
             issued = issued.timeInMillis,
             modified = harvestDate.timeInMillis
         )
@@ -205,7 +214,7 @@ class EventHarvester(
 
     private fun addIsPartOfToEvents(eventURI: String, catalogURI: String) =
         eventMetaRepository.findByIdOrNull(eventURI)
-            ?.run { eventMetaRepository.save(copy(isPartOf = catalogURI)) }
+            ?.run { if (isPartOf != catalogURI) eventMetaRepository.save(copy(isPartOf = catalogURI)) }
 
     private fun CatalogRDFModel.hasChanges(fdkId: String?): Boolean =
         if (fdkId == null) true

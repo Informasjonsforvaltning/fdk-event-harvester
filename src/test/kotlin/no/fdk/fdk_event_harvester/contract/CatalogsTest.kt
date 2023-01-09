@@ -27,7 +27,7 @@ class CatalogsTest: ApiTestContext() {
         val response = apiGet(port, "/events/catalogs?catalogrecords=true", "text/turtle")
         Assumptions.assumeTrue(HttpStatus.OK.value() == response["status"])
 
-        val expected = responseReader.parseFile("catalog_1.ttl", "TURTLE")
+        val expected = responseReader.parseFile("all_catalogs.ttl", "TURTLE")
         val responseModel = responseReader.parseResponse(response["body"] as String, "TURTLE")
 
         assertTrue(checkIfIsomorphicAndPrintDiff(actual = responseModel, expected = expected, name = "CatalogsTest.findAll"))
@@ -38,7 +38,7 @@ class CatalogsTest: ApiTestContext() {
         val response = apiGet(port, "/events/catalogs", "application/trig")
         Assumptions.assumeTrue(HttpStatus.OK.value() == response["status"])
 
-        val expected = responseReader.parseFile("harvest_response_1.ttl", "TURTLE")
+        val expected = responseReader.parseFile("no_records_all_catalogs.ttl", "TURTLE")
         val responseModel = responseReader.parseResponse(response["body"] as String, Lang.TRIG.name)
 
         assertTrue(checkIfIsomorphicAndPrintDiff(actual = responseModel, expected = expected, name = "CatalogsTest.findAll"))

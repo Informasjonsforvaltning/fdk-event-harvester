@@ -17,6 +17,7 @@ spring:
     password: ${RABBIT_PASSWORD}
   data.mongodb.uri: mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@mongodb:27017/eventHarvester?authSource=admin&authMechanism=SCRAM-SHA-1
 application:
+  organizationsUri: ${ORGANIZATION_CATALOG_URI:https://organization-catalog.staging.fellesdatakatalog.digdir.no}/organizations
   eventsUri: ${FDK_BASE_URI:https://staging.fellesdatakatalog.digdir.no}/events
   harvestAdminRootUrl: ${HARVEST_ADMIN_ROOT_URL:http://new-harvest-admin:8080}
 management:
@@ -58,5 +59,6 @@ spring:
     password: admin
   data.mongodb.uri: mongodb://admin:admin@localhost:27017/eventHarvester?authSource=admin&authMechanism=SCRAM-SHA-1
 application:
+  organizationsUri: http://localhost:5000/organizations
   eventsUri: http://localhost:5000/events
   harvestAdminRootUrl: http://localhost:5000

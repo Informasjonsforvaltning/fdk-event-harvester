@@ -6,6 +6,7 @@ import org.springframework.boot.context.properties.ConstructorBinding
 @ConstructorBinding
 @ConfigurationProperties("application")
 data class ApplicationProperties(
+    val organizationsUri: String,
     val eventsUri: String,
     val harvestAdminRootUrl: String
 )
