@@ -1,6 +1,8 @@
 package no.fdk.fdk_event_harvester.utils
 
 import no.fdk.fdk_event_harvester.model.HarvestDataSource
+import no.fdk.fdk_event_harvester.model.Organization
+import no.fdk.fdk_event_harvester.model.PrefLabel
 import org.testcontainers.shaded.com.google.common.collect.ImmutableMap
 import java.util.*
 
@@ -33,5 +35,13 @@ val TEST_HARVEST_SOURCE = HarvestDataSource(
     url = "http://localhost:5000/fdk-public-service-publisher.ttl",
     acceptHeaderValue = "text/turtle",
     dataType = "publicService",
-    dataSourceType = "CPSV-AP-NO"
+    dataSourceType = "CPSV-AP-NO",
+    publisherId = "123456789"
+)
+
+val ORGANIZATION_0 = Organization(
+    organizationId = "123456789",
+    uri = "http://localhost:5000/organizations/123456789",
+    name = "TESTDIREKTORATET",
+    prefLabel = PrefLabel(nb = "Testdirektoratet")
 )
