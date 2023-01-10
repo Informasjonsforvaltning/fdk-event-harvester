@@ -37,6 +37,7 @@ class HarvesterTest {
             .thenReturn(responseReader.readFile("harvest_response_0.ttl"))
         whenever(valuesMock.eventsUri)
             .thenReturn("http://localhost:5000/events")
+        whenever(orgAdapter.getOrganization("123456789")).thenReturn(ORGANIZATION_0)
 
         val report = harvester.harvestEvents(TEST_HARVEST_SOURCE, TEST_HARVEST_DATE, false)
 
@@ -129,6 +130,7 @@ class HarvesterTest {
             .thenReturn("http://localhost:5000/public-services")
         whenever(turtleService.getHarvestSource(TEST_HARVEST_SOURCE.url!!))
             .thenReturn(harvested)
+        whenever(orgAdapter.getOrganization("123456789")).thenReturn(ORGANIZATION_0)
 
         val report = harvester.harvestEvents(TEST_HARVEST_SOURCE, TEST_HARVEST_DATE, true)
 
@@ -179,6 +181,7 @@ class HarvesterTest {
             .thenReturn(responseReader.readFile("no_records_event_1_diff.ttl"))
         whenever(turtleService.getEvent(EVENT_ID_2, false))
             .thenReturn(responseReader.readFile("no_records_event_2.ttl"))
+        whenever(orgAdapter.getOrganization("123456789")).thenReturn(ORGANIZATION_0)
 
         val report = harvester.harvestEvents(TEST_HARVEST_SOURCE, NEW_TEST_HARVEST_DATE, false)
 
