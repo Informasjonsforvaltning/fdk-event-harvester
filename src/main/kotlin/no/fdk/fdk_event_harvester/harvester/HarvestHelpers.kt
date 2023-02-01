@@ -7,6 +7,8 @@ import no.fdk.fdk_event_harvester.rdf.CPSVNO
 import no.fdk.fdk_event_harvester.rdf.CV
 import no.fdk.fdk_event_harvester.rdf.DCATNO
 import no.fdk.fdk_event_harvester.rdf.containsTriple
+import no.fdk.fdk_event_harvester.rdf.createIdFromString
+import no.fdk.fdk_event_harvester.rdf.createRDFResponse
 import no.fdk.fdk_event_harvester.rdf.parseRDFResponse
 import org.apache.jena.query.QueryExecutionFactory
 import org.apache.jena.query.QueryFactory
@@ -17,6 +19,7 @@ import org.apache.jena.rdf.model.ResourceFactory
 import org.apache.jena.rdf.model.ResourceRequiredException
 import org.apache.jena.rdf.model.Statement
 import org.apache.jena.riot.Lang
+import org.apache.jena.util.ResourceUtils
 import org.apache.jena.vocabulary.DCAT
 import org.apache.jena.vocabulary.DCTerms
 import org.apache.jena.vocabulary.RDF
@@ -49,6 +52,7 @@ fun splitCatalogsFromRDF(harvested: Model, allEvents: List<EventRDFModel>, sourc
                 .toSet()
 
             val catalogModelWithoutEvents = resource.extractCatalogModel()
+                .recursiveBlankNodeSkolem(resource.uri)
 
             var catalogModel = catalogModelWithoutEvents
             allEvents.filter { catalogEvents.contains(it.eventURI) }
@@ -126,7 +130,7 @@ private fun Resource.extractEventModel(nsPrefixes: Map<String, String>): EventRD
 
     return EventRDFModel(
         eventURI = uri,
-        harvested = model,
+        harvested = model.recursiveBlankNodeSkolem(uri),
         isMemberOfAnyCatalog = isMemberOfAnyCatalog()
     )
 }
@@ -248,6 +252,36 @@ data class CatalogRDFModel(
 
 fun List<EventRDFModel>.containsFreeServices(): Boolean =
     firstOrNull { !it.isMemberOfAnyCatalog } != null
+
+private fun Model.recursiveBlankNodeSkolem(baseURI: String): Model {
+    val anonSubjects = listSubjects().toList().filter { it.isAnon }
+    return if (anonSubjects.isEmpty()) this
+    else {
+        anonSubjects
+            .filter { it.doesNotContainAnon() }
+            .forEach {
+                ResourceUtils.renameResource(it, "$baseURI/.well-known/skolem/${it.createSkolemID()}")
+            }
+        this.recursiveBlankNodeSkolem(baseURI)
+    }
+}
+
+private fun Resource.doesNotContainAnon(): Boolean =
+    listProperties().toList()
+        .filter { it.isResourceProperty() }
+        .map { it.resource }
+        .filter { it.listProperties().toList().size > 0 }
+        .none { it.isAnon }
+
+private fun Resource.createSkolemID(): String =
+    createIdFromString(
+        listProperties().toModel()
+            .createRDFResponse(Lang.N3)
+            .replace("\\s".toRegex(), "")
+            .toCharArray()
+            .sorted()
+            .toString()
+    )
 
 private fun Model.resourceShouldBeAdded(resource: Resource): Boolean {
     val types = resource.listProperties(RDF.type)

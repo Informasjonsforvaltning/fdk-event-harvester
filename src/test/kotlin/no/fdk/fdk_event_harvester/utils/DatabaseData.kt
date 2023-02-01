@@ -48,7 +48,7 @@ val CATALOG_TURTLE_1 = FDKCatalogTurtle(
 
 val CATALOG_TURTLE_1_NO_RECORDS = CatalogTurtle(
     id = CATALOG_ID_1,
-    turtle = gzip(responseReader.readFile("harvest_response_1.ttl"))
+    turtle = gzip(responseReader.readFile("no_records_catalog_1.ttl"))
 )
 
 val EVENT_META_0 = EventMeta(

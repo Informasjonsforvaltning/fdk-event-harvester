@@ -3,10 +3,16 @@
 @prefix dcat: <http://www.w3.org/ns/dcat#> .
 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
 
 <http://test.no/events/1> a cv:BusinessEvent ;
   dct:identifier "1" ;
+  dct:type <http://test.no/events/1/.well-known/skolem/e854496a-da4d-3349-959d-86c479df75cc> ;
   dct:title "Test event 1"@en .
+
+<http://test.no/events/1/.well-known/skolem/e854496a-da4d-3349-959d-86c479df75cc>
+        a               skos:Concept ;
+        skos:prefLabel  "Starte og drive en bedrift"@nb , "Starting business"@en .
 
 <http://localhost:5000/events/df191147-039c-3919-a180-acc909e55e47>
   a                  dcat:CatalogRecord ;

@@ -52,4 +52,9 @@
 
 <http://test.no/events/1> a cv:BusinessEvent ;
   dct:identifier "1" ;
+  dct:type <http://test.no/events/1/.well-known/skolem/e854496a-da4d-3349-959d-86c479df75cc> ;
   dct:title "Test event 1"@en .
+
+<http://test.no/events/1/.well-known/skolem/e854496a-da4d-3349-959d-86c479df75cc>
+        a               skos:Concept ;
+        skos:prefLabel  "Starte og drive en bedrift"@nb , "Starting business"@en .

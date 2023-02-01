@@ -268,8 +268,14 @@ class HarvesterTest {
             assertEquals(TEST_HARVEST_SOURCE.url, second.firstValue)
         }
 
+        argumentCaptor<Model, String, Boolean>().apply {
+            verify(turtleService, times(2)).saveAsCatalog(first.capture(), second.capture(), third.capture())
+            assertTrue(first.firstValue.isIsomorphicWith(responseReader.parseFile("no_records_catalog_1.ttl", "TURTLE")))
+            assertEquals(CATALOG_ID_1, second.firstValue)
+            assertEquals(listOf(false, false), third.allValues)
+        }
+
         verify(turtleService, times(2)).saveAsEvent(any(), any(), any())
-        verify(turtleService, times(2)).saveAsCatalog(any(), any(), any())
         verify(metaRepository, times(2)).save(any())
         verify(catalogMetaRepository, times(2)).save(any())
 
