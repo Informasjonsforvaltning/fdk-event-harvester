@@ -168,7 +168,7 @@ class EventHarvester(
         dbMeta: CatalogMeta?
     ): CatalogMeta {
         val catalogURI = resourceURI
-        val fdkId = dbMeta?.fdkId ?: createIdFromUri(catalogURI)
+        val fdkId = dbMeta?.fdkId ?: createIdFromString(catalogURI)
         val issued = dbMeta?.issued
             ?.let { timestamp -> calendarFromTimestamp(timestamp) }
             ?: harvestDate
@@ -198,7 +198,7 @@ class EventHarvester(
         harvestDate: Calendar,
         dbMeta: EventMeta?
     ): EventMeta {
-        val fdkId = dbMeta?.fdkId ?: createIdFromUri(eventURI)
+        val fdkId = dbMeta?.fdkId ?: createIdFromString(eventURI)
         val issued = dbMeta?.issued
             ?.let { timestamp -> calendarFromTimestamp(timestamp) }
             ?: harvestDate

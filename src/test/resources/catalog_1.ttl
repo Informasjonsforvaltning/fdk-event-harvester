@@ -4,6 +4,7 @@
 @prefix dcatno: <https://data.norge.no/vocabulary/dcatno#> .
 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
 
 <http://test.no/events/0> a cv:Event ;
   dct:identifier "0" ;
@@ -11,12 +12,23 @@
 
 <http://test.no/events/1> a cv:BusinessEvent ;
   dct:identifier "1" ;
+  dct:type <http://test.no/events/1/.well-known/skolem/e854496a-da4d-3349-959d-86c479df75cc> ;
   dct:title "Test event 1"@en .
+
+<http://test.no/events/1/.well-known/skolem/e854496a-da4d-3349-959d-86c479df75cc>
+        a               skos:Concept ;
+        skos:prefLabel  "Starte og drive en bedrift"@nb , "Starting business"@en .
 
 <http://test.no/catalogs/0> a dcat:Catalog ;
   dct:identifier "catalog" ;
+  dct:publisher <http://test.no/catalogs/0/.well-known/skolem/e3c06028-5cd8-35fc-9434-57a7d59763bb> ;
   dcatno:containsEvent <http://test.no/events/0> , <http://test.no/events/1> ;
   dct:title "Test catalog"@en .
+
+<http://test.no/catalogs/0/.well-known/skolem/e3c06028-5cd8-35fc-9434-57a7d59763bb>
+  a               dct:Agent ;
+  dct:identifier  "123456789" ;
+  foaf:name       "BLANK NODE ORG" .
 
 <http://localhost:5000/events/catalogs/b7c6d34c-624d-3c72-9e30-2b608e433ad7>
   a               dcat:CatalogRecord ;

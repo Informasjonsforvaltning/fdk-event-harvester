@@ -46,8 +46,8 @@ fun Model.createRDFResponse(responseType: Lang): String =
         out.toString("UTF-8")
     }
 
-fun createIdFromUri(uri: String): String =
-    UUID.nameUUIDFromBytes(uri.toByteArray())
+fun createIdFromString(idBase: String): String =
+    UUID.nameUUIDFromBytes(idBase.toByteArray())
         .toString()
 
 fun Model.containsTriple(subj: String, pred: String, obj: String): Boolean {
