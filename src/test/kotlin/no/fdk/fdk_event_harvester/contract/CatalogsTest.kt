@@ -4,7 +4,7 @@ import no.fdk.fdk_event_harvester.utils.*
 import org.apache.jena.riot.Lang
 import org.junit.jupiter.api.*
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.web.server.LocalServerPort
+import org.springframework.boot.test.web.server.LocalServerPort
 import org.springframework.http.HttpStatus
 import org.springframework.test.context.ContextConfiguration
 import kotlin.test.assertTrue
