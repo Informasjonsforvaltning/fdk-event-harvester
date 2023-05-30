@@ -87,10 +87,10 @@ abstract class TurtleDBO {
 
 private fun zippedModelsAreIsomorphic(zip0: String, zip1: String): Boolean {
     val model0 = try {
-        parseRDFResponse(ungzip(zip0), Lang.TURTLE, null)
+        parseRDFResponse(ungzip(zip0), Lang.TURTLE)
     } catch (ex: Exception) { null }
     val model1 = try {
-        parseRDFResponse(ungzip(zip1), Lang.TURTLE, null)
+        parseRDFResponse(ungzip(zip1), Lang.TURTLE)
     } catch (ex: Exception) { null }
 
     return when {

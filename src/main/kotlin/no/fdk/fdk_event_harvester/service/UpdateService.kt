@@ -32,11 +32,11 @@ class UpdateService(
         eventMetaRepository.findAll()
             .forEach {
                 turtleService.getEvent(it.fdkId, withRecords = true)
-                    ?.let { dboTurtle -> parseRDFResponse(dboTurtle, Lang.TURTLE, null) }
+                    ?.let { dboTurtle -> parseRDFResponse(dboTurtle, Lang.TURTLE) }
                     ?.run { eventUnion = eventUnion.union(this) }
 
                 turtleService.getEvent(it.fdkId, withRecords = false)
-                    ?.let { dboTurtle -> parseRDFResponse(dboTurtle, Lang.TURTLE, null) }
+                    ?.let { dboTurtle -> parseRDFResponse(dboTurtle, Lang.TURTLE) }
                     ?.run { eventUnionNoRecords = eventUnionNoRecords.union(this) }
             }
 
@@ -50,11 +50,11 @@ class UpdateService(
             .filter { it.events.isNotEmpty() }
             .forEach {
                 turtleService.getCatalog(it.fdkId, withRecords = true)
-                    ?.let { turtle -> parseRDFResponse(turtle, Lang.TURTLE, null) }
+                    ?.let { turtle -> parseRDFResponse(turtle, Lang.TURTLE) }
                     ?.run { catalogUnion = catalogUnion.union(this) }
 
                 turtleService.getCatalog(it.fdkId, withRecords = false)
-                    ?.let { turtle -> parseRDFResponse(turtle, Lang.TURTLE, null) }
+                    ?.let { turtle -> parseRDFResponse(turtle, Lang.TURTLE) }
                     ?.run { catalogUnionNoRecords = catalogUnionNoRecords.union(this) }
             }
 
@@ -68,7 +68,7 @@ class UpdateService(
                 val eventMeta = event.createMetaModel()
 
                 turtleService.getEvent(event.fdkId, withRecords = false)
-                    ?.let { eventNoRecords -> parseRDFResponse(eventNoRecords, Lang.TURTLE, null) }
+                    ?.let { eventNoRecords -> parseRDFResponse(eventNoRecords, Lang.TURTLE) }
                     ?.let { eventModelNoRecords -> eventMeta.union(eventModelNoRecords) }
                     ?.run { turtleService.saveAsEvent(this, fdkId = event.fdkId, withRecords = true) }
             }
@@ -76,7 +76,7 @@ class UpdateService(
         catalogMetaRepository.findAll()
             .forEach { catalog ->
                 val catalogNoRecords = turtleService.getCatalog(catalog.fdkId, withRecords = false)
-                    ?.let { parseRDFResponse(it, Lang.TURTLE, null) }
+                    ?.let { parseRDFResponse(it, Lang.TURTLE) }
 
                 if (catalogNoRecords != null) {
                     val fdkCatalogURI = "${applicationProperties.eventsUri}/catalogs/${catalog.fdkId}"
