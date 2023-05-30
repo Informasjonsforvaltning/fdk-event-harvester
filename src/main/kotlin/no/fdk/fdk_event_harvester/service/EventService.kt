@@ -13,7 +13,7 @@ class EventService(private val turtleService: TurtleService) {
         turtleService.getEventUnion(withRecords)
             ?.let {
                 if (returnType == Lang.TURTLE) it
-                else parseRDFResponse(it, Lang.TURTLE, null)?.createRDFResponse(returnType)
+                else parseRDFResponse(it, Lang.TURTLE).createRDFResponse(returnType)
             }
             ?: ModelFactory.createDefaultModel().createRDFResponse(returnType)
 
@@ -21,14 +21,14 @@ class EventService(private val turtleService: TurtleService) {
         turtleService.getEvent(id, withRecords)
             ?.let {
                 if (returnType == Lang.TURTLE) it
-                else parseRDFResponse(it, Lang.TURTLE, null)?.createRDFResponse(returnType)
+                else parseRDFResponse(it, Lang.TURTLE).createRDFResponse(returnType)
             }
 
     fun getCatalogs(returnType: Lang, withRecords: Boolean): String =
         turtleService.getCatalogUnion(withRecords)
             ?.let {
                 if (returnType == Lang.TURTLE) it
-                else parseRDFResponse(it, Lang.TURTLE, null).createRDFResponse(returnType)
+                else parseRDFResponse(it, Lang.TURTLE).createRDFResponse(returnType)
             }
             ?: ModelFactory.createDefaultModel().createRDFResponse(returnType)
 
@@ -36,7 +36,7 @@ class EventService(private val turtleService: TurtleService) {
         turtleService.getCatalog(id, withRecords)
             ?.let {
                 if (returnType == Lang.TURTLE) it
-                else parseRDFResponse(it, Lang.TURTLE, null).createRDFResponse(returnType)
+                else parseRDFResponse(it, Lang.TURTLE).createRDFResponse(returnType)
             }
 
 }
