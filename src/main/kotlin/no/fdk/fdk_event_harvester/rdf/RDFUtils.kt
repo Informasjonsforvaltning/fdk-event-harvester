@@ -1,5 +1,6 @@
 package no.fdk.fdk_event_harvester.rdf
 
+import no.fdk.fdk_event_harvester.Application
 import org.apache.jena.query.QueryExecutionFactory
 import org.apache.jena.query.QueryFactory
 import org.apache.jena.rdf.model.Model
@@ -7,10 +8,12 @@ import org.apache.jena.rdf.model.ModelFactory
 import org.apache.jena.rdf.model.Property
 import org.apache.jena.rdf.model.Resource
 import org.apache.jena.riot.Lang
+import org.slf4j.LoggerFactory
 import java.io.ByteArrayOutputStream
 import java.io.StringReader
 import java.util.UUID
 
+private val logger = LoggerFactory.getLogger(Application::class.java)
 const val BACKUP_BASE_URI = "http://example.com/"
 
 fun jenaTypeFromAcceptHeader(accept: String?): Lang? =
@@ -38,6 +41,14 @@ fun parseRDFResponse(responseBody: String, rdfLanguage: Lang): Model {
 
     return responseModel
 }
+
+fun safeParseRDF(rdf: String, lang: Lang): Model =
+    try {
+        parseRDFResponse(rdf, lang)
+    } catch (ex: Exception) {
+        logger.warn("parse failure", ex)
+        ModelFactory.createDefaultModel()
+    }
 
 fun Model.createRDFResponse(responseType: Lang): String =
     ByteArrayOutputStream().use{ out ->

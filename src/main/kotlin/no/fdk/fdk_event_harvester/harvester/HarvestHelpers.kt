@@ -9,7 +9,7 @@ import no.fdk.fdk_event_harvester.rdf.DCATNO
 import no.fdk.fdk_event_harvester.rdf.containsTriple
 import no.fdk.fdk_event_harvester.rdf.createIdFromString
 import no.fdk.fdk_event_harvester.rdf.createRDFResponse
-import no.fdk.fdk_event_harvester.rdf.parseRDFResponse
+import no.fdk.fdk_event_harvester.rdf.safeParseRDF
 import org.apache.jena.query.QueryExecutionFactory
 import org.apache.jena.query.QueryFactory
 import org.apache.jena.rdf.model.Model
@@ -25,17 +25,17 @@ import org.apache.jena.vocabulary.DCTerms
 import org.apache.jena.vocabulary.RDF
 import org.apache.jena.vocabulary.RDFS
 import org.slf4j.LoggerFactory
-import java.util.*
+import java.util.Calendar
 
 private val LOGGER = LoggerFactory.getLogger(Application::class.java)
 
 fun CatalogRDFModel.harvestDiff(dbTurtle: String?): Boolean =
     if (dbTurtle == null) true
-    else !harvested.isIsomorphicWith(parseRDFResponse(dbTurtle, Lang.TURTLE))
+    else !harvested.isIsomorphicWith(safeParseRDF(dbTurtle, Lang.TURTLE))
 
 fun EventRDFModel.harvestDiff(dboNoRecords: String?): Boolean =
     if (dboNoRecords == null) true
-    else !harvested.isIsomorphicWith(parseRDFResponse(dboNoRecords, Lang.TURTLE))
+    else !harvested.isIsomorphicWith(safeParseRDF(dboNoRecords, Lang.TURTLE))
 
 fun splitCatalogsFromRDF(harvested: Model, allEvents: List<EventRDFModel>, sourceURL: String, organization: Organization?): List<CatalogRDFModel> {
     val harvestedCatalogs = harvested.listResourcesWithProperty(RDF.type, DCAT.Catalog)
