@@ -89,7 +89,7 @@ class EventHarvester(
     private fun updateIfChanged(harvested: Model, sourceId: String, sourceURL: String, harvestDate: Calendar,
                                 publisherId: String?, forceUpdate: Boolean): HarvestReport {
         val dbData = turtleService.getHarvestSource(sourceURL)
-            ?.let { parseRDFResponse(it, Lang.TURTLE) }
+            ?.let { safeParseRDF(it, Lang.TURTLE) }
 
         return if (!forceUpdate && dbData != null && harvested.isIsomorphicWith(dbData)) {
             LOGGER.info("No changes from last harvest of $sourceURL")
