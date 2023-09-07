@@ -54,14 +54,14 @@ fun splitCatalogsFromRDF(harvested: Model, allEvents: List<EventRDFModel>, sourc
             val catalogModelWithoutEvents = resource.extractCatalogModel()
                 .recursiveBlankNodeSkolem(resource.uri)
 
-            var catalogModel = catalogModelWithoutEvents
+            val catalogModel = ModelFactory.createDefaultModel()
             allEvents.filter { catalogEvents.contains(it.eventURI) }
-                .forEach { catalogModel = catalogModel.union(it.harvested) }
+                .forEach { catalogModel.add(it.harvested) }
 
             CatalogRDFModel(
                 resourceURI = resource.uri,
                 harvestedWithoutEvents = catalogModelWithoutEvents,
-                harvested = catalogModel,
+                harvested = catalogModel.union(catalogModelWithoutEvents),
                 events = catalogEvents
             )
         }
@@ -119,13 +119,13 @@ private fun List<Resource>.excludeBlankNodes(sourceURL: String): List<Resource> 
     }
 
 private fun Resource.extractEventModel(nsPrefixes: Map<String, String>): EventRDFModel {
-    var model = listProperties().toModel()
+    val model = listProperties().toModel()
     model.setNsPrefixes(nsPrefixes)
 
     listProperties().toList()
         .filter { it.isResourceProperty() }
         .forEach {
-            model = model.recursiveAddNonEventOrServiceResource(it.resource, 10)
+            model.recursiveAddNonEventOrServiceResource(it.resource, 10)
         }
 
     return EventRDFModel(
@@ -144,13 +144,13 @@ private fun generatedCatalog(
     val generatedCatalogURI = "$sourceURL#GeneratedCatalog"
     val catalogModelWithoutEvents = createModelForHarvestSourceCatalog(generatedCatalogURI, eventURIs, organization)
 
-    var catalogModel = catalogModelWithoutEvents
-    events.forEach { catalogModel = catalogModel.union(it.harvested) }
+    val catalogModel = ModelFactory.createDefaultModel()
+    events.forEach { catalogModel.add(it.harvested) }
 
     return CatalogRDFModel(
         resourceURI = generatedCatalogURI,
         harvestedWithoutEvents = catalogModelWithoutEvents,
-        harvested = catalogModel,
+        harvested = catalogModel.union(catalogModelWithoutEvents),
         events = eventURIs
     )
 }
