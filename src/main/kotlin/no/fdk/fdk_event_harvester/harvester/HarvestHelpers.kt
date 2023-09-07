@@ -103,7 +103,7 @@ fun Resource.extractCatalogModel(): Model {
 private fun Model.addCatalogProperties(property: Statement): Model =
     when {
         property.predicate != DCATNO.containsEvent && property.isResourceProperty() ->
-            add(property).recursiveAddNonEventOrServiceResource(property.resource, 5)
+            add(property).recursiveAddNonEventOrServiceResource(property.resource)
         property.predicate != DCATNO.containsEvent -> add(property)
         property.isResourceProperty() && property.resource.isURIResource -> add(property)
         else -> this
@@ -125,7 +125,7 @@ private fun Resource.extractEventModel(nsPrefixes: Map<String, String>): EventRD
     listProperties().toList()
         .filter { it.isResourceProperty() }
         .forEach {
-            model.recursiveAddNonEventOrServiceResource(it.resource, 10)
+            model.recursiveAddNonEventOrServiceResource(it.resource)
         }
 
     return EventRDFModel(
@@ -208,17 +208,13 @@ private fun Resource.addEventsForGeneratedCatalog(services: Set<String>): Resour
     return this
 }
 
-private fun Model.recursiveAddNonEventOrServiceResource(resource: Resource, recursiveCount: Int): Model {
-    val newCount = recursiveCount - 1
-
+private fun Model.recursiveAddNonEventOrServiceResource(resource: Resource): Model {
     if (resourceShouldBeAdded(resource)) {
         add(resource.listProperties())
 
-        if (newCount > 0) {
-            resource.listProperties().toList()
-                .filter { it.isResourceProperty() }
-                .forEach { recursiveAddNonEventOrServiceResource(it.resource, newCount) }
-        }
+        resource.listProperties().toList()
+            .filter { it.isResourceProperty() }
+            .forEach { recursiveAddNonEventOrServiceResource(it.resource) }
     }
 
     return this
