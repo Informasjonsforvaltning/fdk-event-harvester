@@ -13,7 +13,7 @@
     <parent>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-parent</artifactId>
-      <version>3.1.3</version>
+      <version>3.1.5</version>
       <relativePath/>
     </parent>
 
@@ -29,7 +29,7 @@
         <!--end standard properties-->
 
         <kotlin.version>1.9.10</kotlin.version>
-        <testcontainers.version>1.19.0</testcontainers.version>
+        <testcontainers.version>1.19.1</testcontainers.version>
         <jena.version>4.9.0</jena.version>
     </properties>
 
@@ -131,7 +131,7 @@
         <dependency>
             <groupId>org.wiremock</groupId>
             <artifactId>wiremock</artifactId>
-            <version>3.0.2</version>
+            <version>3.2.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -233,7 +233,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.10</version>
+                <version>0.8.11</version>
                 <executions>
                     <execution>
                         <id>before-unit-test-execution</id>
@@ -291,7 +291,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.1.2</version>
+                <version>3.2.1</version>
                 <configuration>
                     <useSystemClassLoader>false</useSystemClassLoader>
                     <argLine>${surefire.jacoco.args}</argLine>
@@ -305,7 +305,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
-                <version>3.1.2</version>
+                <version>3.2.1</version>
                 <configuration>
                     <argLine>${failsafe.jacoco.args}</argLine>
                     <groups>contract</groups>
