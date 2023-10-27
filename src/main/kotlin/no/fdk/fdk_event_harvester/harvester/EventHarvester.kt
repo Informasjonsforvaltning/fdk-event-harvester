@@ -111,36 +111,32 @@ class EventHarvester(
     private fun updateDB(harvested: Model, sourceId: String, sourceURL: String, harvestDate: Calendar,
                          publisherId: String?, forceUpdate: Boolean): HarvestReport {
         val allEvents = splitEventsFromRDF(harvested, sourceURL)
-        return if (allEvents.isEmpty()) {
-            LOGGER.warn("No events found in data harvested from $sourceURL")
-            HarvestReport(
-                id = sourceId,
-                url = sourceURL,
-                harvestError = true,
-                errorMessage = "No events found in data harvested from $sourceURL",
-                startTime = harvestDate.formatWithOsloTimeZone(),
-                endTime = formatNowWithOsloTimeZone()
-            )
-        } else {
-            val updatedEvents = updateEvents(allEvents, harvestDate, forceUpdate)
+        val updatedEvents = updateEvents(allEvents, harvestDate, forceUpdate)
 
-            val organization = if (publisherId != null && allEvents.containsFreeServices()) {
-                orgAdapter.getOrganization(publisherId)
-            } else null
+        val organization = if (publisherId != null && allEvents.containsFreeServices()) {
+            orgAdapter.getOrganization(publisherId)
+        } else null
 
-            val catalogs = splitCatalogsFromRDF(harvested, allEvents, sourceURL, organization)
-            val updatedCatalogs = updateCatalogs(catalogs, harvestDate, forceUpdate)
+        val catalogs = splitCatalogsFromRDF(harvested, allEvents, sourceURL, organization)
+        val updatedCatalogs = updateCatalogs(catalogs, harvestDate, forceUpdate)
 
-            return HarvestReport(
-                id = sourceId,
-                url = sourceURL,
-                harvestError = false,
-                startTime = harvestDate.formatWithOsloTimeZone(),
-                endTime = formatNowWithOsloTimeZone(),
-                changedCatalogs = updatedCatalogs,
-                changedResources = updatedEvents
-            )
-        }
+        val removedEvents = getEventsRemovedThisHarvest(
+            updatedCatalogs.map { catalogFdkUri(it.fdkId) },
+            allEvents.map { it.eventURI }
+        )
+        removedEvents.map { it.copy(removed = true) }
+            .run { eventMetaRepository.saveAll(this) }
+
+        return HarvestReport(
+            id = sourceId,
+            url = sourceURL,
+            harvestError = false,
+            startTime = harvestDate.formatWithOsloTimeZone(),
+            endTime = formatNowWithOsloTimeZone(),
+            changedCatalogs = updatedCatalogs,
+            changedResources = updatedEvents,
+            removedResources = removedEvents.map { FdkIdAndUri(fdkId = it.fdkId, uri = it.uri) }
+        )
     }
 
     private fun updateCatalogs(catalogs: List<CatalogRDFModel>, harvestDate: Calendar, forceUpdate: Boolean): List<FdkIdAndUri> =
@@ -157,8 +153,7 @@ class EventHarvester(
                     withRecords = false
                 )
 
-                val fdkUri = "${applicationProperties.eventsUri}/catalogs/${updatedMeta.fdkId}"
-                it.first.events.forEach { eventURI -> addIsPartOfToEvents(eventURI, fdkUri) }
+                it.first.events.forEach { eventURI -> addIsPartOfToEvents(eventURI, catalogFdkUri(updatedMeta.fdkId)) }
 
                 FdkIdAndUri(fdkId = updatedMeta.fdkId, uri = updatedMeta.uri)
             }
@@ -211,6 +206,13 @@ class EventHarvester(
             modified = harvestDate.timeInMillis
         )
     }
+
+    private fun catalogFdkUri(fdkId: String): String =
+        "${applicationProperties.eventsUri}/catalogs/${fdkId}"
+
+    private fun getEventsRemovedThisHarvest(catalogs: List<String>, events: List<String>): List<EventMeta> =
+        catalogs.flatMap { eventMetaRepository.findAllByIsPartOf(it) }
+            .filter { !it.removed && !events.contains(it.uri) }
 
     private fun addIsPartOfToEvents(eventURI: String, catalogURI: String) =
         eventMetaRepository.findByIdOrNull(eventURI)

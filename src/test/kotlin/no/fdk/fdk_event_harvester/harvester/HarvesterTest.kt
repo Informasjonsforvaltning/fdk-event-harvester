@@ -173,6 +173,10 @@ class HarvesterTest {
             .thenReturn(Optional.of(EVENT_META_1))
         whenever(metaRepository.findById(EVENT_META_2.uri))
             .thenReturn(Optional.of(EVENT_META_2))
+        whenever(metaRepository.findAllByIsPartOf("http://localhost:5000/events/catalogs/$CATALOG_ID_0"))
+            .thenReturn(listOf(EVENT_META_0, EVENT_META_1, EVENT_META_2, EVENT_META_3))
+        whenever(metaRepository.saveAll(listOf(EVENT_META_3.copy(removed = true))))
+            .thenReturn(listOf(EVENT_META_3.copy(removed = true)))
         whenever(turtleService.getCatalog(CATALOG_ID_0, false))
             .thenReturn(responseReader.readFile("no_records_catalog_0_diff.ttl"))
         whenever(turtleService.getEvent(EVENT_ID_0, false))
@@ -221,7 +225,8 @@ class HarvesterTest {
             startTime = "2020-10-15 13:52:16 +0200",
             endTime = report!!.endTime,
             changedCatalogs=listOf(FdkIdAndUri(fdkId= CATALOG_ID_0, uri= CATALOG_META_0.uri)),
-            changedResources = listOf(FdkIdAndUri(fdkId= EVENT_ID_1, uri= EVENT_META_1.uri))
+            changedResources = listOf(FdkIdAndUri(fdkId= EVENT_ID_1, uri= EVENT_META_1.uri)),
+            removedResources = listOf(FdkIdAndUri(fdkId= EVENT_ID_3, uri= EVENT_META_3.uri))
         )
 
         kotlin.test.assertEquals(expectedReport, report)
@@ -295,6 +300,36 @@ class HarvesterTest {
                 FdkIdAndUri(fdkId=EVENT_ID_4, uri="http://test.no/events/1"))
         )
 
+        assertEquals(expectedReport, report)
+    }
+
+    @Test
+    fun ableToHarvestEmptyCollection() {
+        val prev = responseReader.readFile("harvest_response_0.ttl")
+        val harvested = responseReader.readFile("harvest_response_empty.ttl")
+        whenever(adapter.getEvents(TEST_HARVEST_SOURCE))
+            .thenReturn(harvested)
+        whenever(valuesMock.eventsUri)
+            .thenReturn("http://localhost:5000/events")
+        whenever(turtleService.getHarvestSource(TEST_HARVEST_SOURCE.url!!))
+            .thenReturn(prev)
+        whenever(metaRepository.findAllByIsPartOf("http://localhost:5000/events/catalogs/$CATALOG_ID_0"))
+            .thenReturn(listOf(EVENT_META_0, EVENT_META_1, EVENT_META_2))
+        whenever(metaRepository.saveAll(listOf(EVENT_META_0.copy(removed = true), EVENT_META_1.copy(removed = true), EVENT_META_2.copy(removed = true))))
+            .thenReturn(listOf(EVENT_META_0.copy(removed = true), EVENT_META_1.copy(removed = true), EVENT_META_2.copy(removed = true)))
+
+        val report = harvester.harvestEvents(TEST_HARVEST_SOURCE, TEST_HARVEST_DATE, false)
+
+        val expectedReport = HarvestReport(
+            id="test-source",
+            url="http://localhost:5000/fdk-public-service-publisher.ttl",
+            dataType="event",
+            harvestError=false,
+            startTime = "2020-10-05 15:15:39 +0200",
+            endTime = report!!.endTime,
+            changedCatalogs = listOf(FdkIdAndUri(fdkId=CATALOG_ID_0, uri=CATALOG_META_0.uri)),
+            removedResources = listOf(FdkIdAndUri(fdkId= EVENT_ID_0, uri= EVENT_META_0.uri), FdkIdAndUri(fdkId= EVENT_ID_1, uri= EVENT_META_1.uri), FdkIdAndUri(fdkId= EVENT_ID_2, uri= EVENT_META_2.uri))
+        )
         assertEquals(expectedReport, report)
     }
 
