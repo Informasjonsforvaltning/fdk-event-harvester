@@ -23,10 +23,12 @@ application:
 management:
   endpoints:
     web:
-      exposure:
-        include: health, info, prometheus
+      base-path: /
       path-mapping:
         info: ping
+        health: ready
+      exposure:
+        include: health, info, prometheus
     tags:
       application: fdk-event-harvester
 ---
