@@ -30,7 +30,7 @@
 
         <kotlin.version>1.9.10</kotlin.version>
         <testcontainers.version>1.19.1</testcontainers.version>
-        <jena.version>4.9.0</jena.version>
+        <jena.version>4.10.0</jena.version>
     </properties>
 
     <dependencies>
