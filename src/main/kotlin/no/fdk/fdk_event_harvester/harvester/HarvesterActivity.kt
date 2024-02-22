@@ -54,23 +54,27 @@ class HarvesterActivity(
                                     "status", if (report?.harvestError == false) { "success" }  else { "error" },
                                     "type", "event",
                                     "force_update", "$forceUpdate",
-                                    "datasource_id", it.id
+                                    "datasource_id", it.id,
+                                    "datasource_url", it.url
                             ).increment()
                             if (report?.harvestError == false) {
                                 Metrics.counter("harvest_changed_resources_count",
                                         "type", "event",
                                         "force_update", "$forceUpdate",
-                                        "datasource_id", it.id
+                                        "datasource_id", it.id,
+                                        "datasource_url", it.url
                                 ).increment(report.changedResources.size.toDouble())
                                 Metrics.counter("harvest_removed_resources_count",
                                         "type", "event",
                                         "force_update", "$forceUpdate",
-                                        "datasource_id", it.id
+                                        "datasource_id", it.id,
+                                        "datasource_url", it.url
                                 ).increment(report.removedResources.size.toDouble())
                                 Metrics.timer("harvest_time",
                                         "type", "event",
                                         "force_update", "$forceUpdate",
-                                        "datasource_id", it.id).record(timeElapsed.toJavaDuration())
+                                        "datasource_id", it.id,
+                                        "datasource_url", it.url).record(timeElapsed.toJavaDuration())
                             }
                             report
                         } }
