@@ -34,7 +34,7 @@ class UpdateServiceTest {
             whenever(turtleService.getEvent(EVENT_ID_1, false))
                 .thenReturn(responseReader.readFile("no_records_event_1.ttl"))
             whenever(valuesMock.eventsUri)
-                .thenReturn("http://localhost:5000/events")
+                .thenReturn("http://localhost:5050/events")
 
             updateService.updateMetaData()
 

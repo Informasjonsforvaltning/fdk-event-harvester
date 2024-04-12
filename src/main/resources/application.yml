@@ -47,8 +47,8 @@ application:
 spring:
   config.activate.on-profile: contract-test
   security.oauth2.resourceserver.jwt:
-    jwk-set-uri: http://localhost:5000/auth/realms/fdk/protocol/openid-connect/certs
-    issuer-uri: http://localhost:5000/auth/realms/fdk
+    jwk-set-uri: http://localhost:5050/auth/realms/fdk/protocol/openid-connect/certs
+    issuer-uri: http://localhost:5050/auth/realms/fdk
   rabbitmq:
     host: 127.0.0.1
     port: 5672
@@ -56,6 +56,6 @@ spring:
     password: admin
   data.mongodb.uri: mongodb://admin:admin@localhost:27017/eventHarvester?authSource=admin&authMechanism=SCRAM-SHA-1
 application:
-  organizationsUri: http://localhost:5000/organizations
-  eventsUri: http://localhost:5000/events
-  harvestAdminRootUrl: http://localhost:5000
+  organizationsUri: http://localhost:5050/organizations
+  eventsUri: http://localhost:5050/events
+  harvestAdminRootUrl: http://localhost:5050

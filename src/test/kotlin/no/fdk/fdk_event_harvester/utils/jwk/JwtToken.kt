@@ -17,7 +17,7 @@ class JwtToken (private val access: Access) {
             .claim("name", "TEST USER")
             .claim("given_name", "TEST")
             .claim("family_name", "USER")
-            .claim("iss", "http://localhost:5000/auth/realms/fdk")
+            .claim("iss", "http://localhost:5050/auth/realms/fdk")
             .claim("authorities", access.authorities)
             .build()
 

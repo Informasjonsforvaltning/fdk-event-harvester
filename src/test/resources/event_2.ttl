@@ -9,10 +9,10 @@
 @prefix skos:   <http://www.w3.org/2004/02/skos/core#> .
 @prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
 
-<http://localhost:5000/events/fb77d4f2-a11c-33e3-8c49-772c4569613b>
+<http://localhost:5050/events/fb77d4f2-a11c-33e3-8c49-772c4569613b>
         a                  dcat:CatalogRecord ;
         dct:identifier     "fb77d4f2-a11c-33e3-8c49-772c4569613b" ;
-        dct:isPartOf       <http://localhost:5000/events/catalogs/4d2c9e29-2f9a-304f-9e48-34e30a36d068> ;
+        dct:isPartOf       <http://localhost:5050/events/catalogs/e09277f3-1eec-3ab9-a979-79259736d768> ;
         dct:issued         "2020-10-05T13:15:39.831Z"^^xsd:dateTime ;
         dct:modified       "2020-10-05T13:15:39.831Z"^^xsd:dateTime ;
         foaf:primaryTopic  <http://testdirektoratet.no/events/2> .

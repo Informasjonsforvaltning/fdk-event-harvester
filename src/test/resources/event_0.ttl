@@ -20,10 +20,10 @@
         dct:title        "Starte og drive restaurant"@nb ;
         dct:type         <https://data.norge.no/concepts/300> .
 
-<http://localhost:5000/events/cbed84c4-a719-3370-b216-725bfc79978d>
+<http://localhost:5050/events/cbed84c4-a719-3370-b216-725bfc79978d>
         a                  dcat:CatalogRecord ;
         dct:identifier     "cbed84c4-a719-3370-b216-725bfc79978d" ;
-        dct:isPartOf       <http://localhost:5000/events/catalogs/4d2c9e29-2f9a-304f-9e48-34e30a36d068> ;
+        dct:isPartOf       <http://localhost:5050/events/catalogs/e09277f3-1eec-3ab9-a979-79259736d768> ;
         dct:issued         "2020-10-05T13:15:39.831Z"^^xsd:dateTime ;
         dct:modified       "2020-10-05T13:15:39.831Z"^^xsd:dateTime ;
         foaf:primaryTopic  <http://testdirektoratet.no/events/0> .

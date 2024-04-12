@@ -6,7 +6,7 @@ import no.fdk.fdk_event_harvester.model.PrefLabel
 import org.testcontainers.shaded.com.google.common.collect.ImmutableMap
 import java.util.*
 
-const val LOCAL_SERVER_PORT = 5000
+const val LOCAL_SERVER_PORT = 5050
 
 const val MONGO_USER = "testuser"
 const val MONGO_PASSWORD = "testpassword"
@@ -18,7 +18,7 @@ val MONGO_ENV_VALUES: Map<String, String> = ImmutableMap.of(
     "MONGO_INITDB_ROOT_PASSWORD", MONGO_PASSWORD
 )
 
-const val CATALOG_ID_0 = "4d2c9e29-2f9a-304f-9e48-34e30a36d068"
+const val CATALOG_ID_0 = "e09277f3-1eec-3ab9-a979-79259736d768"
 const val CATALOG_ID_1 = "b7c6d34c-624d-3c72-9e30-2b608e433ad7"
 
 const val EVENT_ID_0 = "cbed84c4-a719-3370-b216-725bfc79978d"
@@ -32,7 +32,7 @@ val NEW_TEST_HARVEST_DATE: Calendar = Calendar.Builder().setTimeZone(TimeZone.ge
 
 val TEST_HARVEST_SOURCE = HarvestDataSource(
     id = "test-source",
-    url = "http://localhost:5000/fdk-public-service-publisher.ttl",
+    url = "http://localhost:5050/fdk-public-service-publisher.ttl",
     acceptHeaderValue = "text/turtle",
     dataType = "publicService",
     dataSourceType = "CPSV-AP-NO",
@@ -41,7 +41,7 @@ val TEST_HARVEST_SOURCE = HarvestDataSource(
 
 val ORGANIZATION_0 = Organization(
     organizationId = "123456789",
-    uri = "http://localhost:5000/organizations/123456789",
+    uri = "http://localhost:5050/organizations/123456789",
     name = "TESTDIREKTORATET",
     prefLabel = PrefLabel(nb = "Testdirektoratet")
 )
