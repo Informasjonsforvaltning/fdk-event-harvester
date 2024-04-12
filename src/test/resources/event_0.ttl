@@ -5,6 +5,7 @@
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 @prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
 @prefix dcat:  <http://www.w3.org/ns/dcat#> .
+@prefix dcatno: <https://data.norge.no/vocabulary/dcatno#> .
 @prefix cpsv:  <http://purl.org/vocab/cpsv#> .
 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
 
@@ -27,3 +28,17 @@
         dct:issued         "2020-10-05T13:15:39.831Z"^^xsd:dateTime ;
         dct:modified       "2020-10-05T13:15:39.831Z"^^xsd:dateTime ;
         foaf:primaryTopic  <http://testdirektoratet.no/events/0> .
+
+<http://localhost:5050/fdk-public-service-publisher.ttl#GeneratedCatalog>
+        a       dcat:Catalog ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                        "Testdirektoratet - Hendelsekatalog"@nb , "TESTDIREKTORATET - Hendingskatalog"@nn , "TESTDIREKTORATET - Event catalog"@en ;
+        dct:publisher  <http://localhost:5050/organizations/123456789> ;
+        dcatno:containsEvent <http://testdirektoratet.no/events/2> , <http://testdirektoratet.no/events/0> , <http://testdirektoratet.no/events/1> .
+
+<http://localhost:5050/events/catalogs/e09277f3-1eec-3ab9-a979-79259736d768>
+  a               dcat:CatalogRecord ;
+  dct:identifier  "e09277f3-1eec-3ab9-a979-79259736d768" ;
+  dct:issued         "2020-10-05T13:15:39.831Z"^^xsd:dateTime ;
+  dct:modified       "2020-10-05T13:15:39.831Z"^^xsd:dateTime ;
+  foaf:primaryTopic <http://localhost:5050/fdk-public-service-publisher.ttl#GeneratedCatalog> .

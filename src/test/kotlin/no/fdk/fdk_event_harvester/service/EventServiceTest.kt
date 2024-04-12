@@ -38,7 +38,7 @@ class EventServiceTest {
 
         @Test
         fun getAllHandlesTurtleAndOtherRDF() {
-            val allEvents = javaClass.classLoader.getResource("all_events.ttl")!!.readText()
+            val allEvents = javaClass.classLoader.getResource("all_catalogs.ttl")!!.readText()
             val allEventsNoRecords = javaClass.classLoader.getResource("no_records_all_events.ttl")!!.readText()
 
             whenever(turtleService.getEventUnion(true))
@@ -46,7 +46,7 @@ class EventServiceTest {
             whenever(turtleService.getEventUnion(false))
                 .thenReturn(allEventsNoRecords)
 
-            val expected = responseReader.parseFile("all_events.ttl", "TURTLE")
+            val expected = responseReader.parseFile("all_catalogs.ttl", "TURTLE")
             val expectedNoRecords = responseReader.parseFile("no_records_all_events.ttl", "TURTLE")
 
             val responseTurtle = service.getAllEvents(Lang.TURTLE, true)

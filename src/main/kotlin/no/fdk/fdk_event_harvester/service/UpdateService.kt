@@ -2,6 +2,7 @@ package no.fdk.fdk_event_harvester.service
 
 import no.fdk.fdk_event_harvester.configuration.ApplicationProperties
 import no.fdk.fdk_event_harvester.harvester.calendarFromTimestamp
+import no.fdk.fdk_event_harvester.harvester.extractCatalogModel
 import no.fdk.fdk_event_harvester.model.*
 import no.fdk.fdk_event_harvester.rdf.DCATNO
 import no.fdk.fdk_event_harvester.rdf.containsTriple
@@ -63,16 +64,6 @@ class UpdateService(
     }
 
     fun updateMetaData() {
-        eventMetaRepository.findAll()
-            .forEach { event ->
-                val eventMeta = event.createMetaModel()
-
-                turtleService.getEvent(event.fdkId, withRecords = false)
-                    ?.let { eventNoRecords -> safeParseRDF(eventNoRecords, Lang.TURTLE) }
-                    ?.let { eventModelNoRecords -> eventMeta.union(eventModelNoRecords) }
-                    ?.run { turtleService.saveAsEvent(this, fdkId = event.fdkId, withRecords = true) }
-            }
-
         catalogMetaRepository.findAll()
             .forEach { catalog ->
                 val catalogNoRecords = turtleService.getCatalog(catalog.fdkId, withRecords = false)
@@ -81,13 +72,28 @@ class UpdateService(
                 if (catalogNoRecords != null) {
                     val fdkCatalogURI = "${applicationProperties.eventsUri}/catalogs/${catalog.fdkId}"
                     val catalogMeta = catalog.createMetaModel()
+                    val completeMetaModel = ModelFactory.createDefaultModel()
+                    completeMetaModel.add(catalogMeta)
+
+                    val catalogTriples = catalogNoRecords.getResource(catalog.uri)
+                        .extractCatalogModel()
+                    catalogTriples.add(catalogMeta)
 
                     eventMetaRepository.findAllByIsPartOf(fdkCatalogURI)
                         .filter { it.catalogContainsEvent(catalog.uri, catalogNoRecords) }
-                        .forEach { event -> catalogMeta.add(event.createMetaModel()) }
+                        .forEach { event ->
+                            val eventMeta = event.createMetaModel()
+                            completeMetaModel.add(eventMeta)
+
+                            turtleService.getEvent(event.fdkId, withRecords = false)
+                                ?.let { eventNoRecords -> safeParseRDF(eventNoRecords, Lang.TURTLE) }
+                                ?.let { eventModelNoRecords -> eventMeta.union(eventModelNoRecords) }
+                                ?.let { eventModel -> catalogTriples.union(eventModel) }
+                                ?.run { turtleService.saveAsEvent(this, fdkId = event.fdkId, withRecords = true) }
+                        }
 
                     turtleService.saveAsCatalog(
-                        catalogMeta.union(catalogNoRecords),
+                        completeMetaModel.union(catalogNoRecords),
                         fdkId = catalog.fdkId,
                         withRecords = true
                     )

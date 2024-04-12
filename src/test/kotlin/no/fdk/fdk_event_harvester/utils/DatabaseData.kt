@@ -157,7 +157,7 @@ val HARVESTED_DBO = HarvestSourceTurtle(
 
 val EVENT_UNION_DATA = FDKEventTurtle(
     id = UNION_ID,
-    turtle = gzip(responseReader.readFile("all_events.ttl"))
+    turtle = gzip(responseReader.readFile("all_catalogs.ttl"))
 )
 
 val EVENT_UNION_DATA_NO_RECORDS = EventTurtle(
