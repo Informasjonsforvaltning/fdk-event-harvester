@@ -27,7 +27,7 @@ class EventServicesTest: ApiTestContext() {
         val response = apiGet(port, "/events?catalogrecords=true", "text/turtle")
         Assumptions.assumeTrue(HttpStatus.OK.value() == response["status"])
 
-        val expected = responseReader.parseFile("all_events.ttl", "TURTLE")
+        val expected = responseReader.parseFile("all_catalogs.ttl", "TURTLE")
         val responseModel = responseReader.parseResponse(response["body"] as String, "TURTLE")
 
         assertTrue(checkIfIsomorphicAndPrintDiff(actual = responseModel, expected = expected, name = "ServicesTest.findAll"))
