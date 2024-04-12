@@ -16,7 +16,7 @@ private val responseReader = TestResponseReader()
 
 
 val CATALOG_META_0 = CatalogMeta(
-    uri="http://localhost:5000/fdk-public-service-publisher.ttl#GeneratedCatalog",
+    uri="http://localhost:5050/fdk-public-service-publisher.ttl#GeneratedCatalog",
     fdkId=CATALOG_ID_0,
     events=setOf("http://testdirektoratet.no/events/0", "http://testdirektoratet.no/events/2", "http://testdirektoratet.no/events/1"),
     issued = TEST_HARVEST_DATE.timeInMillis,
@@ -54,7 +54,7 @@ val CATALOG_TURTLE_1_NO_RECORDS = CatalogTurtle(
 val EVENT_META_0 = EventMeta(
     uri = "http://testdirektoratet.no/events/0",
     fdkId = EVENT_ID_0,
-    isPartOf = "http://localhost:5000/events/catalogs/$CATALOG_ID_0",
+    isPartOf = "http://localhost:5050/events/catalogs/$CATALOG_ID_0",
     issued = TEST_HARVEST_DATE.timeInMillis,
     modified = TEST_HARVEST_DATE.timeInMillis
 )
@@ -75,7 +75,7 @@ val EVENT_TURTLE_0_NO_RECORDS = EventTurtle(
 val EVENT_META_1 = EventMeta(
     uri = "http://testdirektoratet.no/events/1",
     fdkId = EVENT_ID_1,
-    isPartOf = "http://localhost:5000/events/catalogs/$CATALOG_ID_0",
+    isPartOf = "http://localhost:5050/events/catalogs/$CATALOG_ID_0",
     issued = TEST_HARVEST_DATE.timeInMillis,
     modified = TEST_HARVEST_DATE.timeInMillis
 )
@@ -93,7 +93,7 @@ val EVENT_TURTLE_1_NO_RECORDS = EventTurtle(
 val EVENT_META_2 = EventMeta(
     uri = "http://testdirektoratet.no/events/2",
     fdkId = EVENT_ID_2,
-    isPartOf = "http://localhost:5000/events/catalogs/$CATALOG_ID_0",
+    isPartOf = "http://localhost:5050/events/catalogs/$CATALOG_ID_0",
     issued = TEST_HARVEST_DATE.timeInMillis,
     modified = TEST_HARVEST_DATE.timeInMillis
 )
@@ -113,7 +113,7 @@ val EVENT_TURTLE_2_NO_RECORDS = EventTurtle(
 val EVENT_META_3 = EventMeta(
     uri = "http://test.no/events/0",
     fdkId = EVENT_ID_3,
-    isPartOf = "http://localhost:5000/events/catalogs/$CATALOG_ID_1",
+    isPartOf = "http://localhost:5050/events/catalogs/$CATALOG_ID_1",
     issued = TEST_HARVEST_DATE.timeInMillis,
     modified = TEST_HARVEST_DATE.timeInMillis
 )
@@ -133,7 +133,7 @@ val EVENT_TURTLE_3_NO_RECORDS = EventTurtle(
 val EVENT_META_4 = EventMeta(
     uri = "http://test.no/events/1",
     fdkId = EVENT_ID_4,
-    isPartOf = "http://localhost:5000/events/catalogs/$CATALOG_ID_1",
+    isPartOf = "http://localhost:5050/events/catalogs/$CATALOG_ID_1",
     issued = TEST_HARVEST_DATE.timeInMillis,
     modified = TEST_HARVEST_DATE.timeInMillis
 )
@@ -151,7 +151,7 @@ val EVENT_TURTLE_4_NO_RECORDS = EventTurtle(
 )
 
 val HARVESTED_DBO = HarvestSourceTurtle(
-    id = "http://localhost:5000/fdk-public-service-publisher.ttl",
+    id = "http://localhost:5050/fdk-public-service-publisher.ttl",
     turtle = gzip(responseReader.readFile("harvest_response_0.ttl"))
 )
 

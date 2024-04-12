@@ -60,11 +60,11 @@
         a               skos:Concept ;
         skos:prefLabel  "Starte og drive en bedrift"@nb , "Starting business"@en .
 
-<http://localhost:5000/fdk-public-service-publisher.ttl#GeneratedCatalog>
+<http://localhost:5050/fdk-public-service-publisher.ttl#GeneratedCatalog>
         a       dcat:Catalog ;
         <http://www.w3.org/2000/01/rdf-schema#label>
                         "Testdirektoratet - Hendelsekatalog"@nb , "TESTDIREKTORATET - Hendingskatalog"@nn , "TESTDIREKTORATET - Event catalog"@en ;
-        dct:publisher  <http://localhost:5000/organizations/123456789> ;
+        dct:publisher  <http://localhost:5050/organizations/123456789> ;
         dcatno:containsEvent <http://testdirektoratet.no/events/2> , <http://testdirektoratet.no/events/0> , <http://testdirektoratet.no/events/1> .
 
 <http://test.no/catalogs/0> a dcat:Catalog ;

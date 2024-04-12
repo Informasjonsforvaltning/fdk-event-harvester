@@ -19,7 +19,7 @@ class OrgAdapterTest: ApiTestContext() {
     @Test
     fun missingOrg() {
         whenever(valuesMock.organizationsUri)
-            .thenReturn("http://localhost:5000/organizations")
+            .thenReturn("http://localhost:5050/organizations")
 
         val org = adapter.getOrganization("111222333")
 
@@ -29,7 +29,7 @@ class OrgAdapterTest: ApiTestContext() {
     @Test
     fun getOrg() {
         whenever(valuesMock.organizationsUri)
-            .thenReturn("http://localhost:5000/organizations")
+            .thenReturn("http://localhost:5050/organizations")
 
         val org = adapter.getOrganization("123456789")
 

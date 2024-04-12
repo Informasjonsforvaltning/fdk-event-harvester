@@ -40,11 +40,11 @@
         dct:title        "Starte og drive restaurant"@nb ;
         dct:type         <https://data.norge.no/concepts/300> .
 
-<http://localhost:5000/fdk-public-service-publisher.ttl#GeneratedCatalog>
+<http://localhost:5050/fdk-public-service-publisher.ttl#GeneratedCatalog>
         a       dcat:Catalog ;
         <http://www.w3.org/2000/01/rdf-schema#label>
                         "Testdirektoratet - Hendelsekatalog"@nb , "TESTDIREKTORATET - Hendingskatalog"@nn , "TESTDIREKTORATET - Event catalog"@en ;
-        dct:publisher  <http://localhost:5000/organizations/123456789> ;
+        dct:publisher  <http://localhost:5050/organizations/123456789> ;
         <https://data.norge.no/vocabulary/dcatno#containsEvent>
                 <http://testdirektoratet.no/events/2> , <http://testdirektoratet.no/events/0> , <http://testdirektoratet.no/events/1> .
 
