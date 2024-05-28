@@ -41,7 +41,6 @@ fun splitCatalogsFromRDF(harvested: Model, allEvents: List<EventRDFModel>, sourc
     val harvestedCatalogs = harvested.listResourcesWithProperty(RDF.type, DCAT.Catalog)
         .toList()
         .excludeBlankNodes(sourceURL)
-        .filter { it.hasProperty(DCATNO.containsEvent) }
         .map { resource ->
             val catalogEvents: Set<String> = resource.listProperties(DCATNO.containsEvent)
                 .toList()
