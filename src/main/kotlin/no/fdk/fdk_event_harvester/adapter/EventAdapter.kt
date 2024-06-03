@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import java.io.BufferedReader
 import java.net.HttpURLConnection
-import java.net.URL
+import java.net.URI
 
 private val LOGGER = LoggerFactory.getLogger(EventAdapter::class.java)
 private const val TEN_MINUTES = 600000
@@ -16,7 +16,7 @@ private const val TEN_MINUTES = 600000
 class EventAdapter {
 
     fun getEvents(source: HarvestDataSource): String {
-        val connection = URL(source.url).openConnection() as HttpURLConnection
+        val connection = URI(source.url).toURL().openConnection() as HttpURLConnection
         try {
             connection.setRequestProperty("Accept", source.acceptHeaderValue)
             connection.connectTimeout = TEN_MINUTES

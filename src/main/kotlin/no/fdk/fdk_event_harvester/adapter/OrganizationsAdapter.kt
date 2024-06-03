@@ -11,6 +11,7 @@ import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
 import java.io.BufferedReader
 import java.net.HttpURLConnection
+import java.net.URI
 import java.net.URL
 
 private val logger = LoggerFactory.getLogger(OrganizationsAdapter::class.java)
@@ -19,7 +20,7 @@ private val logger = LoggerFactory.getLogger(OrganizationsAdapter::class.java)
 class OrganizationsAdapter(private val applicationProperties: ApplicationProperties) {
     fun getOrganization(id: String): Organization? {
         val uri = "${applicationProperties.organizationsUri}/$id"
-        with(URL(uri).openConnection() as HttpURLConnection) {
+        with(URI(uri).toURL().openConnection() as HttpURLConnection) {
             try {
                 setRequestProperty(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON.toString())
 

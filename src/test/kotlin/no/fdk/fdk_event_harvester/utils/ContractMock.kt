@@ -14,7 +14,7 @@ fun startMockServer() {
                 .willReturn(aResponse()
                         .withStatus(200))
         )
-        mockserver.stubFor(get(urlEqualTo("/datasources?dataType=publicService"))
+        mockserver.stubFor(get(urlEqualTo("/internal/datasources?dataType=publicService"))
             .willReturn(okJson(jacksonObjectMapper().writeValueAsString(
                 listOf(TEST_HARVEST_SOURCE))))
         )
