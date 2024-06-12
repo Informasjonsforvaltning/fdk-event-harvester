@@ -1,0 +1,10 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - fdk-event-harvester-deployment.yaml
+  - fdk-event-harvester-service.yaml
+images:
+  - name: fdk-event-harvester
+    newName: eu.gcr.io/digdir-fdk-infra/fdk-event-harvester
+    newTag: $(GIT_COMMIT_SHA)
