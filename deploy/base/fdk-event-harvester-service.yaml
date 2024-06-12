@@ -1,0 +1,18 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    fdk.service: fdk-event-harvester
+  name: fdk-event-harvester
+spec:
+  type: NodePort
+  ports:
+    - name: "8080"
+      port: 8080
+      targetPort: 8080
+  selector:
+    fdk.service: fdk-event-harvester
+status:
+  loadBalancer: {}

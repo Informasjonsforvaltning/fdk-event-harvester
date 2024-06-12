@@ -1,0 +1,38 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    fdk.service: fdk-event-harvester
+  name: fdk-event-harvester
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      fdk.service: fdk-event-harvester
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        fdk.service: fdk-event-harvester
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/prometheus"  
+    spec:
+      containers:
+        - name: fdk-event-harvester
+          image: fdk-event-harvester
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              memory: "650Mi"
+              cpu: 5m
+            limits:
+              memory: "650Mi"
+      restartPolicy: Always
+status: {}
