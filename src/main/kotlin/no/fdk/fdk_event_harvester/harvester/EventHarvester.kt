@@ -178,16 +178,32 @@ class EventHarvester(
     }
 
     private fun updateEvents(events: List<EventRDFModel>, harvestDate: Calendar, forceUpdate: Boolean): List<FdkIdAndUri> =
-        events
-            .map { Pair(it, eventMetaRepository.findByIdOrNull(it.eventURI)) }
-            .filter { forceUpdate || it.first.hasChanges(it.second?.fdkId) }
-            .map {
-                val updatedMeta = it.first.mapToMetaDBO(harvestDate, it.second)
-                eventMetaRepository.save(updatedMeta)
-                turtleService.saveAsEvent(it.first.harvested, updatedMeta.fdkId, false)
+        events.mapNotNull {
+            it.updateDBOs(harvestDate, forceUpdate)
+                ?.let { meta -> FdkIdAndUri(fdkId = meta.fdkId, uri = it.eventURI) }
+        }
 
-                FdkIdAndUri(fdkId = updatedMeta.fdkId, uri = it.first.eventURI)
+    private fun EventRDFModel.updateDBOs(harvestDate: Calendar, forceUpdate: Boolean): EventMeta? {
+        val dbMeta = eventMetaRepository.findByIdOrNull(eventURI)
+        return when {
+            dbMeta == null || dbMeta.removed || hasChanges(dbMeta.fdkId) -> {
+                val updatedMeta = mapToMetaDBO(harvestDate, dbMeta)
+                eventMetaRepository.save(updatedMeta)
+                turtleService.saveAsEvent(harvested, updatedMeta.fdkId, false)
+
+                updatedMeta
             }
+            forceUpdate -> {
+                turtleService.saveAsEvent(
+                    model = harvested,
+                    fdkId = dbMeta.fdkId,
+                    withRecords = false
+                )
+                dbMeta
+            }
+            else -> null
+        }
+    }
 
     private fun EventRDFModel.mapToMetaDBO(
         harvestDate: Calendar,
