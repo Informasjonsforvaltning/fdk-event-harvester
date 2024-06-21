@@ -131,6 +131,21 @@ class HarvesterTest {
         whenever(turtleService.getHarvestSource(TEST_HARVEST_SOURCE.url!!))
             .thenReturn(harvested)
         whenever(orgAdapter.getOrganization("123456789")).thenReturn(ORGANIZATION_0)
+        whenever(metaRepository.findById(EVENT_META_0.uri))
+            .thenReturn(Optional.of(EVENT_META_0))
+        whenever(metaRepository.findById(EVENT_META_1.uri))
+            .thenReturn(Optional.of(EVENT_META_1))
+        whenever(metaRepository.findById(EVENT_META_2.uri))
+            .thenReturn(Optional.of(EVENT_META_2))
+        whenever(metaRepository.findAllByIsPartOf("http://localhost:5050/events/catalogs/$CATALOG_ID_0"))
+            .thenReturn(listOf(EVENT_META_0, EVENT_META_1, EVENT_META_2))
+        whenever(turtleService.getEvent(EVENT_ID_0, withRecords = false))
+            .thenReturn(responseReader.readFile("no_records_event_0.ttl"))
+        whenever(turtleService.getEvent(EVENT_ID_1, withRecords = false))
+            .thenReturn(responseReader.readFile("no_records_event_1.ttl"))
+        whenever(turtleService.getEvent(EVENT_ID_2, withRecords = false))
+            .thenReturn(responseReader.readFile("no_records_event_2.ttl"))
+
 
         val report = harvester.harvestEvents(TEST_HARVEST_SOURCE, TEST_HARVEST_DATE, true)
 
