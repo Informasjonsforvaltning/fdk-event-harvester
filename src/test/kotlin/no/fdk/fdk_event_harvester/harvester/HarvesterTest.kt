@@ -333,4 +333,50 @@ class HarvesterTest {
         assertEquals(expectedReport, report)
     }
 
+    @Test
+    fun earlierRemovedEventWithNoChangesAddedToReport() {
+        val harvested = responseReader.readFile("harvest_response_0.ttl")
+        whenever(adapter.getEvents(TEST_HARVEST_SOURCE))
+            .thenReturn(harvested)
+        whenever(turtleService.getHarvestSource(TEST_HARVEST_SOURCE.url!!))
+            .thenReturn(responseReader.readFile("harvest_response_empty.ttl"))
+        whenever(metaRepository.findById(EVENT_META_0.uri))
+            .thenReturn(Optional.of(EVENT_META_0.copy(removed = true)))
+        whenever(metaRepository.findById(EVENT_META_1.uri))
+            .thenReturn(Optional.of(EVENT_META_1))
+        whenever(metaRepository.findById(EVENT_META_2.uri))
+            .thenReturn(Optional.of(EVENT_META_2))
+        whenever(metaRepository.findAllByIsPartOf("http://localhost:5050/events/catalogs/$CATALOG_ID_0"))
+            .thenReturn(listOf(EVENT_META_0.copy(removed = true), EVENT_META_1, EVENT_META_2))
+        whenever(turtleService.getEvent(EVENT_ID_0, withRecords = false))
+            .thenReturn(responseReader.readFile("no_records_event_0.ttl"))
+        whenever(turtleService.getEvent(EVENT_ID_1, withRecords = false))
+            .thenReturn(responseReader.readFile("no_records_event_1.ttl"))
+        whenever(turtleService.getEvent(EVENT_ID_2, withRecords = false))
+            .thenReturn(responseReader.readFile("no_records_event_2.ttl"))
+
+        whenever(valuesMock.eventsUri)
+            .thenReturn("http://localhost:5050/events")
+
+        val report = harvester.harvestEvents(TEST_HARVEST_SOURCE, TEST_HARVEST_DATE, false)
+
+        argumentCaptor<EventMeta>().apply {
+            verify(metaRepository, times(1)).save(capture())
+            kotlin.test.assertEquals(EVENT_META_0, firstValue)
+        }
+
+        val expectedReport = HarvestReport(
+            id="test-source",
+            url="http://localhost:5050/fdk-public-service-publisher.ttl",
+            dataType="event",
+            harvestError=false,
+            startTime = "2020-10-05 15:15:39 +0200",
+            endTime = report!!.endTime,
+            changedCatalogs = listOf(FdkIdAndUri(fdkId=CATALOG_ID_0, uri=CATALOG_META_0.uri)),
+            changedResources = listOf(FdkIdAndUri(fdkId= EVENT_ID_0, uri= EVENT_META_0.uri))
+        )
+
+        kotlin.test.assertEquals(expectedReport, report)
+    }
+
 }
