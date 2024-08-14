@@ -25,9 +25,13 @@ import org.apache.jena.vocabulary.DCTerms
 import org.apache.jena.vocabulary.RDF
 import org.apache.jena.vocabulary.RDFS
 import org.slf4j.LoggerFactory
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 import java.util.Calendar
 
 private val LOGGER = LoggerFactory.getLogger(Application::class.java)
+private const val dateFormat: String = "yyyy-MM-dd HH:mm:ss Z"
 
 fun CatalogRDFModel.harvestDiff(dbTurtle: String?): Boolean =
     if (dbTurtle == null) true
@@ -304,5 +308,13 @@ private fun Resource.isMemberOfAnyCatalog(): Boolean {
     val query = QueryFactory.create(askQuery)
     return QueryExecutionFactory.create(query, model).execAsk()
 }
+
+fun formatNowWithOsloTimeZone(): String =
+    ZonedDateTime.now(ZoneId.of("Europe/Oslo"))
+        .format(DateTimeFormatter.ofPattern(dateFormat))
+
+fun Calendar.formatWithOsloTimeZone(): String =
+    ZonedDateTime.from(toInstant().atZone(ZoneId.of("Europe/Oslo")))
+        .format(DateTimeFormatter.ofPattern(dateFormat))
 
 class HarvestException(url: String) : Exception("Harvest failed for $url")
