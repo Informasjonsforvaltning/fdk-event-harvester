@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository
 @Repository
 interface EventMetaRepository : MongoRepository<EventMeta, String> {
     fun findAllByIsPartOf(isPartOf: String): List<EventMeta>
+    fun findAllByFdkId(fdkId: String): List<EventMeta>
 }
