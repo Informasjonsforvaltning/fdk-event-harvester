@@ -3,12 +3,12 @@ package no.fdk.fdk_event_harvester.controller
 import no.fdk.fdk_event_harvester.rdf.jenaTypeFromAcceptHeader
 import no.fdk.fdk_event_harvester.service.EventService
 import org.apache.jena.riot.Lang
-import org.slf4j.LoggerFactory
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.*
+
 @Controller
 @CrossOrigin
 @RequestMapping(
