@@ -1,5 +1,6 @@
 package no.fdk.fdk_event_harvester.service
 
+import no.fdk.fdk_event_harvester.model.DuplicateIRI
 import no.fdk.fdk_event_harvester.model.EventMeta
 import no.fdk.fdk_event_harvester.model.FdkIdAndUri
 import no.fdk.fdk_event_harvester.model.HarvestReport
@@ -12,13 +13,14 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
-import org.mockito.kotlin.capture
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.springframework.web.server.ResponseStatusException
+import java.util.*
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
@@ -160,6 +162,154 @@ class EventServiceTest {
                     firstValue
                 )
             }
+        }
+
+    }
+
+    @Nested
+    internal inner class RemoveDuplicates {
+
+        @Test
+        fun throwsExceptionWhenRemoveIRINotFoundInDB() {
+            whenever(repository.findById("https://123.no"))
+                .thenReturn(Optional.empty())
+            whenever(repository.findById(EVENT_META_1.uri))
+                .thenReturn(Optional.of(EVENT_META_1))
+
+            val duplicateIRI = DuplicateIRI(
+                iriToRemove = "https://123.no",
+                iriToRetain = EVENT_META_1.uri
+            )
+            assertThrows<ResponseStatusException> { service.removeDuplicates(listOf(duplicateIRI)) }
+        }
+
+        @Test
+        fun createsNewMetaWhenRetainIRINotFoundInDB() {
+            whenever(repository.findById(EVENT_META_0.uri))
+                .thenReturn(Optional.of(EVENT_META_0))
+            whenever(repository.findById(EVENT_META_1.uri))
+                .thenReturn(Optional.empty())
+
+            val duplicateIRI = DuplicateIRI(
+                iriToRemove = EVENT_META_0.uri,
+                iriToRetain = EVENT_META_1.uri
+            )
+            service.removeDuplicates(listOf(duplicateIRI))
+
+            argumentCaptor<List<EventMeta>>().apply {
+                verify(repository, times(1)).saveAll(capture())
+                assertEquals(listOf(EVENT_META_0.copy(removed = true), EVENT_META_0.copy(uri = EVENT_META_1.uri)), firstValue)
+            }
+
+            verify(publisher, times(0)).send(any())
+        }
+
+        @Test
+        fun sendsRabbitReportWithRetainFdkIdWhenKeepingRemoveFdkId() {
+            whenever(repository.findById(EVENT_META_0.uri))
+                .thenReturn(Optional.of(EVENT_META_0))
+            whenever(repository.findById(EVENT_META_1.uri))
+                .thenReturn(Optional.of(EVENT_META_1))
+
+            val duplicateIRI = DuplicateIRI(
+                iriToRemove = EVENT_META_0.uri,
+                iriToRetain = EVENT_META_1.uri
+            )
+            service.removeDuplicates(listOf(duplicateIRI))
+
+            argumentCaptor<List<EventMeta>>().apply {
+                verify(repository, times(1)).saveAll(capture())
+                assertEquals(listOf(
+                    EVENT_META_0.copy(removed = true),
+                    EVENT_META_0.copy(uri = EVENT_META_1.uri, isPartOf = EVENT_META_1.isPartOf)
+                ), firstValue)
+            }
+
+            val expectedReport = HarvestReport(
+                id = "duplicate-delete",
+                url = "https://fellesdatakatalog.digdir.no/duplicates",
+                harvestError = false,
+                startTime = "startTime",
+                endTime = "endTime",
+                removedResources = listOf(FdkIdAndUri(EVENT_META_1.fdkId, EVENT_META_1.uri))
+            )
+            argumentCaptor<List<HarvestReport>>().apply {
+                verify(publisher, times(1)).send(capture())
+
+                assertEquals(
+                    listOf(expectedReport.copy(
+                        startTime = firstValue.first().startTime,
+                        endTime = firstValue.first().endTime
+                    )),
+                    firstValue
+                )
+            }
+        }
+
+        @Test
+        fun sendsRabbitReportWithRemoveFdkIdWhenNotKeepingRemoveFdkId() {
+            whenever(repository.findById(EVENT_META_0.uri))
+                .thenReturn(Optional.of(EVENT_META_0))
+            whenever(repository.findById(EVENT_META_1.uri))
+                .thenReturn(Optional.of(EVENT_META_1))
+
+            val duplicateIRI = DuplicateIRI(
+                iriToRemove = EVENT_META_1.uri,
+                iriToRetain = EVENT_META_0.uri,
+                keepRemovedFdkId = false
+            )
+            service.removeDuplicates(listOf(duplicateIRI))
+
+            argumentCaptor<List<EventMeta>>().apply {
+                verify(repository, times(1)).saveAll(capture())
+                assertEquals(listOf(
+                    EVENT_META_1.copy(removed = true),
+                    EVENT_META_0
+                ), firstValue)
+            }
+
+            val expectedReport = HarvestReport(
+                id = "duplicate-delete",
+                url = "https://fellesdatakatalog.digdir.no/duplicates",
+                harvestError = false,
+                startTime = "startTime",
+                endTime = "endTime",
+                removedResources = listOf(FdkIdAndUri(EVENT_META_1.fdkId, EVENT_META_1.uri))
+            )
+            argumentCaptor<List<HarvestReport>>().apply {
+                verify(publisher, times(1)).send(capture())
+
+                assertEquals(
+                    listOf(expectedReport.copy(
+                        startTime = firstValue.first().startTime,
+                        endTime = firstValue.first().endTime
+                    )),
+                    firstValue
+                )
+            }
+        }
+
+        @Test
+        fun throwsExceptionWhenTryingToReportAlreadyRemovedAsRemoved() {
+            whenever(repository.findById(EVENT_META_0.uri))
+                .thenReturn(Optional.of(EVENT_META_0.copy(removed = true)))
+            whenever(repository.findById(EVENT_META_1.uri))
+                .thenReturn(Optional.of(EVENT_META_1))
+
+            val duplicateIRI = DuplicateIRI(
+                iriToRemove = EVENT_META_0.uri,
+                iriToRetain = EVENT_META_1.uri,
+                keepRemovedFdkId = false
+            )
+
+            assertThrows<ResponseStatusException> { service.removeDuplicates(listOf(duplicateIRI)) }
+
+            whenever(repository.findById(EVENT_META_0.uri))
+                .thenReturn(Optional.of(EVENT_META_0))
+            whenever(repository.findById(EVENT_META_1.uri))
+                .thenReturn(Optional.of(EVENT_META_1.copy(removed = true)))
+
+            assertThrows<ResponseStatusException> { service.removeDuplicates(listOf(duplicateIRI.copy(keepRemovedFdkId = true))) }
         }
 
     }

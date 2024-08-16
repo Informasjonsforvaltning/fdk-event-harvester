@@ -12,9 +12,6 @@ import org.apache.jena.riot.Lang
 import org.slf4j.LoggerFactory
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
-import java.time.ZoneId
-import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
 import java.util.*
 
 private val LOGGER = LoggerFactory.getLogger(EventHarvester::class.java)

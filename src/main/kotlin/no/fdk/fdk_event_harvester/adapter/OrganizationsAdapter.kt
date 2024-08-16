@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service
 import java.io.BufferedReader
 import java.net.HttpURLConnection
 import java.net.URI
-import java.net.URL
 
 private val logger = LoggerFactory.getLogger(OrganizationsAdapter::class.java)
 

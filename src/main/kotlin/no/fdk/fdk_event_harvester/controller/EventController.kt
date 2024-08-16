@@ -1,10 +1,10 @@
 package no.fdk.fdk_event_harvester.controller
 
+import no.fdk.fdk_event_harvester.model.DuplicateIRI
 import no.fdk.fdk_event_harvester.rdf.jenaTypeFromAcceptHeader
 import no.fdk.fdk_event_harvester.service.EndpointPermissions
 import no.fdk.fdk_event_harvester.service.EventService
 import org.apache.jena.riot.Lang
-import org.slf4j.LoggerFactory
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -60,6 +60,16 @@ open class EventsController(
         if (endpointPermissions.hasAdminPermission(jwt)) {
             eventService.removeEvent(id)
             ResponseEntity(HttpStatus.NO_CONTENT)
+        } else ResponseEntity(HttpStatus.FORBIDDEN)
+
+    @PostMapping("/duplicates")
+    fun removeDuplicates(
+        @AuthenticationPrincipal jwt: Jwt,
+        @RequestBody duplicates: List<DuplicateIRI>
+    ): ResponseEntity<Void> =
+        if (endpointPermissions.hasAdminPermission(jwt)) {
+            eventService.removeDuplicates(duplicates)
+            ResponseEntity(HttpStatus.OK)
         } else ResponseEntity(HttpStatus.FORBIDDEN)
 
 }
