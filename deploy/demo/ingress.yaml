@@ -1,0 +1,25 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: fdk-event-harvester
+  annotations:
+    nginx.ingress.kubernetes.io/server-snippet: |
+      server_tokens off;
+      location ~ ^/(ping|ready|prometheus) {
+        deny all;
+        return 404;
+      }
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: events.demo.fellesdatakatalog.digdir.no
+      http:
+        paths:
+          - backend:
+              service:
+                name: nginx-harvester
+                port:
+                  number: 8080
+            path: /
+            pathType: Prefix
