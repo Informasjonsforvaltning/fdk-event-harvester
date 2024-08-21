@@ -160,7 +160,7 @@ class EventServicesTest : ApiTestContext() {
             val body = listOf(DuplicateIRI(iriToRemove = EVENT_META_0.uri, iriToRetain = EVENT_META_1.uri))
             val response = authorizedRequest(
                 port,
-                "/events/duplicates",
+                "/events/remove-duplicates",
                 null,
                 HttpMethod.POST,
                 mapper.writeValueAsString(body)
@@ -173,7 +173,7 @@ class EventServicesTest : ApiTestContext() {
             val body = listOf(DuplicateIRI(iriToRemove = EVENT_META_0.uri, iriToRetain = EVENT_META_0.uri))
             val response = authorizedRequest(
                 port,
-                "/events/duplicates",
+                "/events/remove-duplicates",
                 JwtToken(Access.ORG_WRITE).toString(),
                 HttpMethod.POST,
                 mapper.writeValueAsString(body)
@@ -187,7 +187,7 @@ class EventServicesTest : ApiTestContext() {
             val response =
                 authorizedRequest(
                     port,
-                    "/events/duplicates",
+                    "/events/remove-duplicates",
                     JwtToken(Access.ROOT).toString(),
                     HttpMethod.POST,
                     mapper.writeValueAsString(body)
@@ -200,7 +200,7 @@ class EventServicesTest : ApiTestContext() {
             val body = listOf(DuplicateIRI(iriToRemove = EVENT_META_0.uri, iriToRetain = EVENT_META_0.uri))
             val response = authorizedRequest(
                 port,
-                "/events/duplicates",
+                "/events/remove-duplicates",
                 JwtToken(Access.ROOT).toString(),
                 HttpMethod.POST,
                 mapper.writeValueAsString(body)
