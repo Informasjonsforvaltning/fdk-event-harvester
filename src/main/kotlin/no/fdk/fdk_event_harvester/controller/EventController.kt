@@ -62,6 +62,16 @@ open class EventsController(
             ResponseEntity(HttpStatus.OK)
         } else ResponseEntity(HttpStatus.FORBIDDEN)
 
+    @DeleteMapping("/{id}")
+    fun purgeEventById(
+        @AuthenticationPrincipal jwt: Jwt,
+        @PathVariable id: String
+    ): ResponseEntity<Void> =
+        if (endpointPermissions.hasAdminPermission(jwt)) {
+            eventService.purgeByFdkId(id)
+            ResponseEntity(HttpStatus.NO_CONTENT)
+        } else ResponseEntity(HttpStatus.FORBIDDEN)
+
     @PostMapping("/remove-duplicates")
     fun removeDuplicates(
         @AuthenticationPrincipal jwt: Jwt,
