@@ -6,7 +6,6 @@ logging:
   level.org.apache.jena: ERROR
 server:
   port: 8080
-  error.include-message: always
 spring:
   security.oauth2.resourceserver.jwt:
     jwk-set-uri: ${SSO_HOST:https://sso.staging.fellesdatakatalog.digdir.no}/auth/realms/fdk/protocol/openid-connect/certs
