@@ -111,9 +111,9 @@ class EventServicesTest : ApiTestContext() {
         fun unauthorizedForNoToken() {
             val response = authorizedRequest(
                 port,
-                "/events/$EVENT_ID_0",
+                "/events/$EVENT_ID_0/remove",
                 null,
-                HttpMethod.DELETE
+                HttpMethod.POST
             )
             assertEquals(HttpStatus.UNAUTHORIZED.value(), response["status"])
         }
@@ -122,9 +122,9 @@ class EventServicesTest : ApiTestContext() {
         fun forbiddenWithNonSysAdminRole() {
             val response = authorizedRequest(
                 port,
-                "/events/$EVENT_ID_0",
+                "/events/$EVENT_ID_0/remove",
                 JwtToken(Access.ORG_WRITE).toString(),
-                HttpMethod.DELETE
+                HttpMethod.POST
             )
             assertEquals(HttpStatus.FORBIDDEN.value(), response["status"])
         }
@@ -133,9 +133,9 @@ class EventServicesTest : ApiTestContext() {
         fun notFoundWhenIdNotInDB() {
             val response = authorizedRequest(
                 port,
-                "/events/123",
+                "/events/123/remove",
                 JwtToken(Access.ROOT).toString(),
-                HttpMethod.DELETE
+                HttpMethod.POST
             )
             assertEquals(HttpStatus.NOT_FOUND.value(), response["status"])
         }
@@ -144,11 +144,11 @@ class EventServicesTest : ApiTestContext() {
         fun okWithSysAdminRole() {
             val response = authorizedRequest(
                 port,
-                "/events/$EVENT_ID_0",
+                "/events/$EVENT_ID_0/remove",
                 JwtToken(Access.ROOT).toString(),
-                HttpMethod.DELETE
+                HttpMethod.POST
             )
-            assertEquals(HttpStatus.NO_CONTENT.value(), response["status"])
+            assertEquals(HttpStatus.OK.value(), response["status"])
         }
     }
 

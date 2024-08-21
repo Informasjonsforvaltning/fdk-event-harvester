@@ -52,14 +52,14 @@ open class EventsController(
         else ResponseEntity(eventService.getAllEvents(returnType ?: Lang.TURTLE, catalogRecords), HttpStatus.OK)
     }
 
-    @DeleteMapping("/{id}")
+    @PostMapping("/{id}/remove")
     fun removeInformationModelById(
         @AuthenticationPrincipal jwt: Jwt,
         @PathVariable id: String
     ): ResponseEntity<Void> =
         if (endpointPermissions.hasAdminPermission(jwt)) {
             eventService.removeEvent(id)
-            ResponseEntity(HttpStatus.NO_CONTENT)
+            ResponseEntity(HttpStatus.OK)
         } else ResponseEntity(HttpStatus.FORBIDDEN)
 
     @PostMapping("/duplicates")
