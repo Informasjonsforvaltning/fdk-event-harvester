@@ -98,6 +98,11 @@ class TurtleService(
             ?.turtle
             ?.let { ungzip(it) }
 
+    fun deleteEventFiles(fdkId: String) {
+        eventRepository.deleteById(fdkId)
+        fdkEventRepository.deleteById(fdkId)
+    }
+
 }
 
 private fun Model.createEventTurtleDBO(id: String): EventTurtle =

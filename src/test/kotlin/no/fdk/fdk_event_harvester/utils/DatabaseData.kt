@@ -90,6 +90,25 @@ val EVENT_TURTLE_1_NO_RECORDS = EventTurtle(
     turtle = gzip(responseReader.readFile("no_records_event_1.ttl"))
 )
 
+val REMOVED_EVENT_META = EventMeta(
+    uri = "http://testdirektoratet.no/events/removed",
+    fdkId = "removed",
+    isPartOf = "http://localhost:5050/events/catalogs/$CATALOG_ID_0",
+    removed = true,
+    issued = TEST_HARVEST_DATE.timeInMillis,
+    modified = TEST_HARVEST_DATE.timeInMillis
+)
+
+val REMOVED_EVENT_TURTLE = FDKEventTurtle(
+    id = "removed",
+    turtle = gzip(responseReader.readFile("event_1.ttl"))
+)
+
+val REMOVED_EVENT_TURTLE_NO_RECORDS = EventTurtle(
+    id = "removed",
+    turtle = gzip(responseReader.readFile("no_records_event_1.ttl"))
+)
+
 val EVENT_META_2 = EventMeta(
     uri = "http://testdirektoratet.no/events/2",
     fdkId = EVENT_ID_2,
@@ -179,16 +198,16 @@ fun harvestSourceTurtlePopulation(): List<Document> =
     listOf(HARVESTED_DBO).map { it.mapDBO() }
 
 fun fdkEventTurtlePopulation(): List<Document> =
-    listOf(EVENT_UNION_DATA, EVENT_TURTLE_0, EVENT_TURTLE_1, EVENT_TURTLE_2, EVENT_TURTLE_3, EVENT_TURTLE_4)
+    listOf(EVENT_UNION_DATA, EVENT_TURTLE_0, EVENT_TURTLE_1, EVENT_TURTLE_2, EVENT_TURTLE_3, EVENT_TURTLE_4, REMOVED_EVENT_TURTLE)
         .map { it.mapDBO() }
 
 fun eventTurtlePopulation(): List<Document> =
     listOf(EVENT_TURTLE_0_NO_RECORDS, EVENT_TURTLE_1_NO_RECORDS, EVENT_UNION_DATA_NO_RECORDS,
-        EVENT_TURTLE_2_NO_RECORDS, EVENT_TURTLE_3_NO_RECORDS, EVENT_TURTLE_4_NO_RECORDS)
+        EVENT_TURTLE_2_NO_RECORDS, EVENT_TURTLE_3_NO_RECORDS, EVENT_TURTLE_4_NO_RECORDS, REMOVED_EVENT_TURTLE_NO_RECORDS)
         .map { it.mapDBO() }
 
 fun eventMetaPopulation(): List<Document> =
-    listOf(EVENT_META_0, EVENT_META_1, EVENT_META_2, EVENT_META_3, EVENT_META_4)
+    listOf(EVENT_META_0, EVENT_META_1, EVENT_META_2, EVENT_META_3, EVENT_META_4, REMOVED_EVENT_META)
         .map { it.mapDBO() }
 
 fun fdkCatalogTurtlePopulation(): List<Document> =
@@ -216,6 +235,7 @@ private fun EventMeta.mapDBO(): Document =
         .append("_id", uri)
         .append("fdkId", fdkId)
         .append("isPartOf", isPartOf)
+        .append("removed", removed)
         .append("issued", issued)
         .append("modified", modified)
 

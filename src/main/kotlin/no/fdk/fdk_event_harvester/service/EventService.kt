@@ -117,4 +117,13 @@ class EventService(
         }
     }
 
+    // Purges everything associated with a removed fdkID
+    fun purgeByFdkId(fdkId: String) {
+        eventMetaRepository.findAllByFdkId(fdkId)
+            .also { events -> if (events.any { !it.removed }) throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Unable to purge files, event with id $fdkId has not been removed") }
+            .run { eventMetaRepository.deleteAll(this) }
+
+        turtleService.deleteEventFiles(fdkId)
+    }
+
 }
