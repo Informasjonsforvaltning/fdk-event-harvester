@@ -13,7 +13,7 @@
     <parent>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-parent</artifactId>
-      <version>3.3.2</version>
+      <version>3.3.4</version>
       <relativePath/>
     </parent>
 
@@ -28,9 +28,9 @@
         <maven.exec.skip>false</maven.exec.skip>
         <!--end standard properties-->
 
-        <kotlin.version>2.0.10</kotlin.version>
-        <testcontainers.version>1.20.1</testcontainers.version>
-        <jena.version>5.1.0</jena.version>
+        <kotlin.version>2.0.21</kotlin.version>
+        <testcontainers.version>1.20.2</testcontainers.version>
+        <jena.version>5.2.0</jena.version>
     </properties>
 
     <dependencies>
@@ -85,7 +85,7 @@
         <dependency>
             <groupId>org.jetbrains.kotlinx</groupId>
             <artifactId>kotlinx-coroutines-core</artifactId>
-            <version>1.8.1</version>
+            <version>1.9.0</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.module</groupId>
@@ -277,7 +277,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.3.1</version>
+                <version>3.5.1</version>
                 <configuration>
                     <useSystemClassLoader>false</useSystemClassLoader>
                     <argLine>${surefire.jacoco.args}</argLine>
@@ -291,7 +291,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
-                <version>3.3.1</version>
+                <version>3.5.1</version>
                 <configuration>
                     <argLine>${failsafe.jacoco.args}</argLine>
                     <groups>contract</groups>
