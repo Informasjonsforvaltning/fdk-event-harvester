@@ -21,6 +21,7 @@ application:
   eventsUri: ${FDK_BASE_URI:https://staging.fellesdatakatalog.digdir.no}/events
   harvestAdminRootUrl: ${HARVEST_ADMIN_ROOT_URL:http://new-harvest-admin:8080}
   harvestAdminApiKey: ${ADMIN_API_KEY}
+  cors.originPatterns: "${CORS_ORIGIN_PATTERNS}"
 management:
   endpoints:
     web:
@@ -45,6 +46,7 @@ application:
   eventsUri: https://staging.fellesdatakatalog.digdir.no/events
   harvestAdminRootUrl: https://new-admin.staging.fellesdatakatalog.digdir.no
   harvestAdminApiKey: test-key
+  cors.originPatterns: "*"
 ---
 spring:
   config.activate.on-profile: contract-test
@@ -62,3 +64,4 @@ application:
   eventsUri: http://localhost:5050/events
   harvestAdminRootUrl: http://localhost:5050
   harvestAdminApiKey: test-key
+  cors.originPatterns: "*"
