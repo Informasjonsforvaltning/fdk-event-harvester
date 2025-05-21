@@ -15,7 +15,15 @@ spring:
     port: 5672
     username: ${RABBIT_USERNAME}
     password: ${RABBIT_PASSWORD}
-  data.mongodb.uri: mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@mongodb:27017/eventHarvester?authSource=admin&authMechanism=SCRAM-SHA-1
+  data.mongodb:
+    host: ${MONGODB_HOST}
+    username: ${MONGODB_USER}
+    password: ${MONGODB_PASSWORD}
+    authentication-database: ${MONGODB_AUTH}
+    replica-set-name: ${MONGODB_REPLICASET}
+    port: 27017
+    database: eventHarvester
+    auto-index-creation: true
 application:
   organizationsUri: ${ORGANIZATION_CATALOG_URI:https://organization-catalog.staging.fellesdatakatalog.digdir.no}/organizations
   eventsUri: ${FDK_BASE_URI:https://staging.fellesdatakatalog.digdir.no}/events
@@ -41,7 +49,12 @@ spring:
     port: 5672
     username: admin
     password: admin
-  data.mongodb.uri: mongodb://admin:admin@localhost:27017/eventHarvester?authSource=admin&authMechanism=SCRAM-SHA-1
+  data.mongodb:
+    host: localhost
+    username: admin
+    password: admin
+    authentication-database: admin
+    replica-set-name: null
 application:
   eventsUri: https://staging.fellesdatakatalog.digdir.no/events
   harvestAdminRootUrl: https://new-admin.staging.fellesdatakatalog.digdir.no
@@ -58,7 +71,12 @@ spring:
     port: 5672
     username: admin
     password: admin
-  data.mongodb.uri: mongodb://admin:admin@localhost:27017/eventHarvester?authSource=admin&authMechanism=SCRAM-SHA-1
+  data.mongodb:
+    host: localhost
+    username: testuser
+    password: testpassword
+    authentication-database: admin
+    replica-set-name: null
 application:
   organizationsUri: http://localhost:5050/organizations
   eventsUri: http://localhost:5050/events
