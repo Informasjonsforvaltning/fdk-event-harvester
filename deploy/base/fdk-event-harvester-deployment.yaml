@@ -85,7 +85,6 @@ spec:
                 secretKeyRef:
                   name: fdk-event-harvester
                   key: CORS_ORIGIN_PATTERNS
-              value: https://staging.fellesdatakatalog.digdir.no,https://*.staging.fellesdatakatalog.digdir.no,http://localhost:*
           image: fdk-event-harvester
           imagePullPolicy: Always
           ports:
