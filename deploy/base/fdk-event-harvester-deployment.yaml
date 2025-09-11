@@ -24,6 +24,67 @@ spec:
     spec:
       containers:
         - name: fdk-event-harvester
+          env:
+            - name: FDK_BASE_URI
+              valueFrom:
+                secretKeyRef:
+                  name: commonurl
+                  key: FDK_BASE_URI
+            - name: RABBIT_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: rabbitmq
+                  key: RABBITMQ_USERNAME
+            - name: RABBIT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: rabbitmq
+                  key: RABBITMQ_PASSWORD
+            - name: HARVEST_ADMIN_ROOT_URL
+              valueFrom:
+                secretKeyRef:
+                  name: commonurl
+                  key: ADMIN_API_BASE_URI
+            - name: MONGODB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: fdk-event-harvester
+                  key: MONGODB_USER
+            - name: MONGODB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: fdk-event-harvester
+                  key: MONGODB_PASSWORD
+            - name: MONGODB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb
+                  key: MONGODB_HOST
+            - name: MONGODB_REPLICASET
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb
+                  key: MONGODB_REPLICASET
+            - name: MONGODB_AUTH
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb
+                  key: MONGODB_AUTH
+            - name: SSO_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: commonurl
+                  key: SSO_BASE_URI
+            - name: ADMIN_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: fdk-harvest-admin
+                  key: API_KEY
+            - name: CORS_ORIGIN_PATTERNS
+              valueFrom:
+                secretKeyRef:
+                  name: fdk-event-harvester
+                  key: CORS_ORIGIN_PATTERNS
           image: fdk-event-harvester
           imagePullPolicy: Always
           ports:
