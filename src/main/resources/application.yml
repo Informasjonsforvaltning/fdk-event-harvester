@@ -8,8 +8,8 @@ server:
   port: 8080
 spring:
   security.oauth2.resourceserver.jwt:
-    jwk-set-uri: ${SSO_HOST:https://sso.staging.fellesdatakatalog.digdir.no}/auth/realms/fdk/protocol/openid-connect/certs
-    issuer-uri: ${SSO_HOST:https://sso.staging.fellesdatakatalog.digdir.no}/auth/realms/fdk
+    jwk-set-uri: ${KEYCLOAK_OIDC_ISSUER:https://keycloak.staging.fellesdatakatalog.digdir.no/realms/fdk}/protocol/openid-connect/certs
+    issuer-uri: ${KEYCLOAK_OIDC_ISSUER:https://keycloak.staging.fellesdatakatalog.digdir.no/realms/fdk}
   rabbitmq:
     host: rabbitmq
     port: 5672
@@ -64,8 +64,8 @@ application:
 spring:
   config.activate.on-profile: contract-test
   security.oauth2.resourceserver.jwt:
-    jwk-set-uri: http://localhost:5050/auth/realms/fdk/protocol/openid-connect/certs
-    issuer-uri: http://localhost:5050/auth/realms/fdk
+    jwk-set-uri: http://localhost:5050/realms/fdk/protocol/openid-connect/certs
+    issuer-uri: http://localhost:5050/realms/fdk
   rabbitmq:
     host: 127.0.0.1
     port: 5672

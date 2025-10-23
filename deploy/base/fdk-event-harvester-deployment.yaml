@@ -70,11 +70,11 @@ spec:
                 secretKeyRef:
                   name: mongodb
                   key: MONGODB_AUTH
-            - name: SSO_HOST
+            - name: KEYCLOAK_OIDC_ISSUER
               valueFrom:
                 secretKeyRef:
-                  name: commonurl
-                  key: SSO_BASE_URI
+                  name: keycloak
+                  key: KEYCLOAK_OIDC_ISSUER
             - name: ADMIN_API_KEY
               valueFrom:
                 secretKeyRef:
