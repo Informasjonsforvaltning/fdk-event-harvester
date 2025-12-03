@@ -8,7 +8,6 @@ import no.fdk.fdk_event_harvester.model.FDKCatalogTurtle
 import no.fdk.fdk_event_harvester.model.FDKEventTurtle
 import no.fdk.fdk_event_harvester.model.HarvestSourceTurtle
 import no.fdk.fdk_event_harvester.model.TurtleDBO
-import no.fdk.fdk_event_harvester.service.UNION_ID
 import no.fdk.fdk_event_harvester.service.gzip
 import org.bson.Document
 
@@ -174,35 +173,15 @@ val HARVESTED_DBO = HarvestSourceTurtle(
     turtle = gzip(responseReader.readFile("harvest_response_0.ttl"))
 )
 
-val EVENT_UNION_DATA = FDKEventTurtle(
-    id = UNION_ID,
-    turtle = gzip(responseReader.readFile("all_catalogs.ttl"))
-)
-
-val EVENT_UNION_DATA_NO_RECORDS = EventTurtle(
-    id = UNION_ID,
-    turtle = gzip(responseReader.readFile("no_records_all_events.ttl"))
-)
-
-val CATALOG_UNION = FDKCatalogTurtle(
-    id = UNION_ID,
-    turtle = gzip(responseReader.readFile("all_catalogs.ttl"))
-)
-
-val CATALOG_UNION_NO_RECORDS = CatalogTurtle(
-    id = UNION_ID,
-    turtle = gzip(responseReader.readFile("no_records_all_catalogs.ttl"))
-)
-
 fun harvestSourceTurtlePopulation(): List<Document> =
     listOf(HARVESTED_DBO).map { it.mapDBO() }
 
 fun fdkEventTurtlePopulation(): List<Document> =
-    listOf(EVENT_UNION_DATA, EVENT_TURTLE_0, EVENT_TURTLE_1, EVENT_TURTLE_2, EVENT_TURTLE_3, EVENT_TURTLE_4, REMOVED_EVENT_TURTLE)
+    listOf(EVENT_TURTLE_0, EVENT_TURTLE_1, EVENT_TURTLE_2, EVENT_TURTLE_3, EVENT_TURTLE_4, REMOVED_EVENT_TURTLE)
         .map { it.mapDBO() }
 
 fun eventTurtlePopulation(): List<Document> =
-    listOf(EVENT_TURTLE_0_NO_RECORDS, EVENT_TURTLE_1_NO_RECORDS, EVENT_UNION_DATA_NO_RECORDS,
+    listOf(EVENT_TURTLE_0_NO_RECORDS, EVENT_TURTLE_1_NO_RECORDS,
         EVENT_TURTLE_2_NO_RECORDS, EVENT_TURTLE_3_NO_RECORDS, EVENT_TURTLE_4_NO_RECORDS, REMOVED_EVENT_TURTLE_NO_RECORDS)
         .map { it.mapDBO() }
 
@@ -211,11 +190,11 @@ fun eventMetaPopulation(): List<Document> =
         .map { it.mapDBO() }
 
 fun fdkCatalogTurtlePopulation(): List<Document> =
-    listOf(CATALOG_UNION, CATALOG_TURTLE_0, CATALOG_TURTLE_1)
+    listOf(CATALOG_TURTLE_0, CATALOG_TURTLE_1)
         .map { it.mapDBO() }
 
 fun catalogTurtlePopulation(): List<Document> =
-    listOf(CATALOG_UNION_NO_RECORDS, CATALOG_TURTLE_0_NO_RECORDS, CATALOG_TURTLE_1_NO_RECORDS)
+    listOf(CATALOG_TURTLE_0_NO_RECORDS, CATALOG_TURTLE_1_NO_RECORDS)
         .map { it.mapDBO() }
 
 fun catalogMetaPopulation(): List<Document> =

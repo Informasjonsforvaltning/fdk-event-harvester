@@ -34,53 +34,6 @@ class EventServiceTest {
     private val responseReader = TestResponseReader()
 
     @Nested
-    internal inner class AllEvents {
-
-        @Test
-        fun responseIsometricWithEmptyModelForEmptyDB() {
-            whenever(turtleService.getEventUnion(true))
-                .thenReturn(null)
-            whenever(turtleService.getEventUnion(false))
-                .thenReturn(null)
-
-            val expected = responseReader.parseResponse("", "TURTLE")
-
-            val responseTurtle = service.getAllEvents(Lang.TURTLE, true)
-            val responseJsonLD = service.getAllEvents(Lang.JSONLD, false)
-
-            assertTrue(expected.isIsomorphicWith(responseReader.parseResponse(responseTurtle, "TURTLE")))
-            assertTrue(expected.isIsomorphicWith(responseReader.parseResponse(responseJsonLD, "JSON-LD")))
-        }
-
-        @Test
-        fun getAllHandlesTurtleAndOtherRDF() {
-            val allEvents = javaClass.classLoader.getResource("all_catalogs.ttl")!!.readText()
-            val allEventsNoRecords = javaClass.classLoader.getResource("no_records_all_events.ttl")!!.readText()
-
-            whenever(turtleService.getEventUnion(true))
-                .thenReturn(allEvents)
-            whenever(turtleService.getEventUnion(false))
-                .thenReturn(allEventsNoRecords)
-
-            val expected = responseReader.parseFile("all_catalogs.ttl", "TURTLE")
-            val expectedNoRecords = responseReader.parseFile("no_records_all_events.ttl", "TURTLE")
-
-            val responseTurtle = service.getAllEvents(Lang.TURTLE, true)
-            val responseN3 = service.getAllEvents(Lang.N3, true)
-
-            val responseNTriples = service.getAllEvents(Lang.NTRIPLES, false)
-            val responseRdfJson = service.getAllEvents(Lang.RDFJSON, false)
-
-            assertTrue(expected.isIsomorphicWith(responseReader.parseResponse(responseTurtle, "TURTLE")))
-            assertTrue(expected.isIsomorphicWith(responseReader.parseResponse(responseN3, "N3")))
-
-            assertTrue(expectedNoRecords.isIsomorphicWith(responseReader.parseResponse(responseNTriples, "N-TRIPLES")))
-            assertTrue(expectedNoRecords.isIsomorphicWith(responseReader.parseResponse(responseRdfJson, "RDFJSON")))
-        }
-
-    }
-
-    @Nested
     internal inner class EventById {
 
         @Test

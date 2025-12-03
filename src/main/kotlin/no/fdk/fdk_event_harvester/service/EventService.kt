@@ -8,7 +8,6 @@ import no.fdk.fdk_event_harvester.rabbit.RabbitMQPublisher
 import no.fdk.fdk_event_harvester.rdf.createRDFResponse
 import no.fdk.fdk_event_harvester.rdf.parseRDFResponse
 import no.fdk.fdk_event_harvester.repository.EventMetaRepository
-import org.apache.jena.rdf.model.ModelFactory
 import org.apache.jena.riot.Lang
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
@@ -22,28 +21,12 @@ class EventService(
     private val turtleService: TurtleService
 ) {
 
-    fun getAllEvents(returnType: Lang, withRecords: Boolean): String =
-        turtleService.getEventUnion(withRecords)
-            ?.let {
-                if (returnType == Lang.TURTLE) it
-                else parseRDFResponse(it, Lang.TURTLE).createRDFResponse(returnType)
-            }
-            ?: ModelFactory.createDefaultModel().createRDFResponse(returnType)
-
     fun getEventById(id: String, returnType: Lang, withRecords: Boolean): String? =
         turtleService.getEvent(id, withRecords)
             ?.let {
                 if (returnType == Lang.TURTLE) it
                 else parseRDFResponse(it, Lang.TURTLE).createRDFResponse(returnType)
             }
-
-    fun getCatalogs(returnType: Lang, withRecords: Boolean): String =
-        turtleService.getCatalogUnion(withRecords)
-            ?.let {
-                if (returnType == Lang.TURTLE) it
-                else parseRDFResponse(it, Lang.TURTLE).createRDFResponse(returnType)
-            }
-            ?: ModelFactory.createDefaultModel().createRDFResponse(returnType)
 
     fun getCatalogById(id: String, returnType: Lang, withRecords: Boolean): String? =
         turtleService.getCatalog(id, withRecords)

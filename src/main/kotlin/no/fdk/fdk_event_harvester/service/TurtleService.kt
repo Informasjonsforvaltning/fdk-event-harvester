@@ -21,9 +21,6 @@ import java.util.zip.GZIPInputStream
 import java.util.zip.GZIPOutputStream
 import kotlin.text.Charsets.UTF_8
 
-const val UNION_ID = "union-graph"
-
-
 @Service
 class TurtleService(
     private val eventRepository: EventTurtleRepository,
@@ -32,32 +29,6 @@ class TurtleService(
     private val fdkCatalogRepository: FDKCatalogTurtleRepository,
     private val harvestSourceRepository: HarvestSourceTurtleRepository
 ) {
-
-    fun saveAsCatalogUnion(model: Model, withRecords: Boolean) {
-        if (withRecords) fdkCatalogRepository.save(model.createFDKCatalogTurtleDBO(UNION_ID))
-        else catalogRepository.save(model.createCatalogTurtleDBO(UNION_ID))
-    }
-
-    fun getCatalogUnion(withRecords: Boolean): String? =
-        if (withRecords) fdkCatalogRepository.findByIdOrNull(UNION_ID)
-            ?.turtle
-            ?.let { ungzip(it) }
-        else catalogRepository.findByIdOrNull(UNION_ID)
-            ?.turtle
-            ?.let { ungzip(it) }
-
-    fun saveAsEventUnion(model: Model, withRecords: Boolean) {
-        if (withRecords) fdkEventRepository.save(model.createFDKEventTurtleDBO(UNION_ID))
-        else eventRepository.save(model.createEventTurtleDBO(UNION_ID))
-    }
-
-    fun getEventUnion(withRecords: Boolean): String? =
-        if (withRecords) fdkEventRepository.findByIdOrNull(UNION_ID)
-            ?.turtle
-            ?.let { ungzip(it) }
-        else eventRepository.findByIdOrNull(UNION_ID)
-            ?.turtle
-            ?.let { ungzip(it) }
 
     fun saveAsEvent(model: Model, fdkId: String, withRecords: Boolean) {
         if (withRecords) fdkEventRepository.save(model.createFDKEventTurtleDBO(fdkId))

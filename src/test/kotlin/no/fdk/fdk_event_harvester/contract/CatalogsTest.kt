@@ -23,28 +23,6 @@ class CatalogsTest: ApiTestContext() {
     private val responseReader = TestResponseReader()
 
     @Test
-    fun findAllWithRecords() {
-        val response = apiGet(port, "/events/catalogs?catalogrecords=true", "text/turtle")
-        Assumptions.assumeTrue(HttpStatus.OK.value() == response["status"])
-
-        val expected = responseReader.parseFile("all_catalogs.ttl", "TURTLE")
-        val responseModel = responseReader.parseResponse(response["body"] as String, "TURTLE")
-
-        assertTrue(checkIfIsomorphicAndPrintDiff(actual = responseModel, expected = expected, name = "CatalogsTest.findAll"))
-    }
-
-    @Test
-    fun findAllNoRecords() {
-        val response = apiGet(port, "/events/catalogs", "application/trig")
-        Assumptions.assumeTrue(HttpStatus.OK.value() == response["status"])
-
-        val expected = responseReader.parseFile("no_records_all_catalogs.ttl", "TURTLE")
-        val responseModel = responseReader.parseResponse(response["body"] as String, Lang.TRIG.name)
-
-        assertTrue(checkIfIsomorphicAndPrintDiff(actual = responseModel, expected = expected, name = "CatalogsTest.findAll"))
-    }
-
-    @Test
     fun findSpecificWithRecords() {
         val response = apiGet(port, "/events/catalogs/$CATALOG_ID_1?catalogrecords=true", "application/rdf+json")
         Assumptions.assumeTrue(HttpStatus.OK.value() == response["status"])

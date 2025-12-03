@@ -45,12 +45,8 @@ open class EventsController(
     fun getCatalogs(
         @RequestHeader(HttpHeaders.ACCEPT) accept: String?,
         @RequestParam(value = "catalogrecords", required = false) catalogRecords: Boolean = false
-    ): ResponseEntity<String> {
-        val returnType = jenaTypeFromAcceptHeader(accept)
-
-        return if (returnType == Lang.RDFNULL) ResponseEntity(HttpStatus.NOT_ACCEPTABLE)
-        else ResponseEntity(eventService.getAllEvents(returnType ?: Lang.TURTLE, catalogRecords), HttpStatus.OK)
-    }
+    ): ResponseEntity<String> =
+        ResponseEntity(HttpStatus.MOVED_PERMANENTLY)
 
     @PostMapping("/{id}/remove")
     fun removeInformationModelById(
