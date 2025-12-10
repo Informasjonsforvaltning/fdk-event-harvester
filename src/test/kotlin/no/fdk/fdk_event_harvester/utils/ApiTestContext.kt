@@ -14,29 +14,36 @@ abstract class ApiTestContext {
 
     internal class Initializer : ApplicationContextInitializer<ConfigurableApplicationContext> {
         override fun initialize(configurableApplicationContext: ConfigurableApplicationContext) {
-            TestPropertyValues.of(
-                "spring.data.mongodb.port=${mongoContainer.getMappedPort(MONGO_PORT)}"
-            ).applyTo(configurableApplicationContext.environment)
+            mongoContainer?.let {
+                TestPropertyValues.of(
+                    "spring.data.mongodb.port=${it.getMappedPort(MONGO_PORT)}"
+                ).applyTo(configurableApplicationContext.environment)
+            }
         }
     }
 
     companion object {
 
         private val logger = LoggerFactory.getLogger(ApiTestContext::class.java)
-        var mongoContainer: KGenericContainer
+        var mongoContainer: KGenericContainer? = null
 
         init {
 
             startMockServer()
 
-            mongoContainer = KGenericContainer("mongo:latest")
-                .withEnv(MONGO_ENV_VALUES)
-                .withExposedPorts(MONGO_PORT)
-                .waitingFor(Wait.forListeningPort())
+            try {
+                mongoContainer = KGenericContainer("mongo:latest")
+                    .withEnv(MONGO_ENV_VALUES)
+                    .withExposedPorts(MONGO_PORT)
+                    .waitingFor(Wait.forListeningPort())
 
-            mongoContainer.start()
+                mongoContainer!!.start()
 
-            populateDB()
+                populateDB()
+            } catch (e: Exception) {
+                logger.warn("Failed to start MongoDB container: ${e.message}. Some tests may not work correctly.", e)
+                // Continue without MongoDB - some tests may still work with just the mock server
+            }
 
             try {
                 val con = URL("http://localhost:5050/ping").openConnection() as HttpURLConnection

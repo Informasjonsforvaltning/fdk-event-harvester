@@ -1,0 +1,25 @@
+name: Build test
+
+permissions:
+  contents: read
+  packages: write
+
+on:
+  pull_request:
+    types: [ready_for_review, opened, reopened, synchronize]
+    branches:
+      - main
+
+jobs:
+  build-fdk-event-harvester:
+    name: Build when pull request is created
+    if: ${{ github.actor != 'dependabot[bot]' &&  github.event.pull_request.draft == false }}
+    uses: Informasjonsforvaltning/workflows/.github/workflows/build-push.yaml@main
+    with:
+      app_name: fdk-event-harvester
+      environment: test
+      java_version: '17'
+      coverage_file_path: ./target/site/jacoco/jacoco.xml
+    secrets:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

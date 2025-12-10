@@ -77,6 +77,8 @@ class HarvesterTest {
         }
 
         val expectedReport = HarvestReport(
+            dataSourceId="test-source",
+            dataSourceUrl="http://localhost:5050/fdk-public-service-publisher.ttl",
             id="test-source",
             url="http://localhost:5050/fdk-public-service-publisher.ttl",
             dataType="event",
@@ -110,6 +112,8 @@ class HarvesterTest {
         verify(metaRepository, times(0)).save(any())
 
         val expectedReport = HarvestReport(
+            dataSourceId="test-source",
+            dataSourceUrl="http://localhost:5050/fdk-public-service-publisher.ttl",
             id="test-source",
             url="http://localhost:5050/fdk-public-service-publisher.ttl",
             dataType="event",
@@ -156,6 +160,8 @@ class HarvesterTest {
         verify(metaRepository, times(3)).save(any())
 
         val expectedReport = HarvestReport(
+            dataSourceId="test-source",
+            dataSourceUrl="http://localhost:5050/fdk-public-service-publisher.ttl",
             id="test-source",
             url="http://localhost:5050/fdk-public-service-publisher.ttl",
             dataType="event",
@@ -233,6 +239,8 @@ class HarvesterTest {
         }
 
         val expectedReport = HarvestReport(
+            dataSourceId="test-source",
+            dataSourceUrl="http://localhost:5050/fdk-public-service-publisher.ttl",
             id="test-source",
             url="http://localhost:5050/fdk-public-service-publisher.ttl",
             dataType="event",
@@ -261,6 +269,8 @@ class HarvesterTest {
         verify(metaRepository, times(0)).save(any())
 
         val expectedReport = HarvestReport(
+            dataSourceId="test-source",
+            dataSourceUrl="http://localhost:5050/fdk-public-service-publisher.ttl",
             id="test-source",
             url="http://localhost:5050/fdk-public-service-publisher.ttl",
             dataType="event",
@@ -300,6 +310,8 @@ class HarvesterTest {
         verify(catalogMetaRepository, times(2)).save(any())
 
         val expectedReport = HarvestReport(
+            dataSourceId="test-source",
+            dataSourceUrl="http://localhost:5050/fdk-public-service-publisher.ttl",
             id="test-source",
             url="http://localhost:5050/fdk-public-service-publisher.ttl",
             dataType="event",
@@ -336,6 +348,8 @@ class HarvesterTest {
         val report = harvester.harvestEvents(TEST_HARVEST_SOURCE, TEST_HARVEST_DATE, false)
 
         val expectedReport = HarvestReport(
+            dataSourceId="test-source",
+            dataSourceUrl="http://localhost:5050/fdk-public-service-publisher.ttl",
             id="test-source",
             url="http://localhost:5050/fdk-public-service-publisher.ttl",
             dataType="event",
@@ -381,6 +395,8 @@ class HarvesterTest {
         }
 
         val expectedReport = HarvestReport(
+            dataSourceId="test-source",
+            dataSourceUrl="http://localhost:5050/fdk-public-service-publisher.ttl",
             id="test-source",
             url="http://localhost:5050/fdk-public-service-publisher.ttl",
             dataType="event",

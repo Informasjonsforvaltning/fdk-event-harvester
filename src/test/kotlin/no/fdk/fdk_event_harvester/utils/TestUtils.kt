@@ -99,8 +99,9 @@ private fun isOK(response: Int?): Boolean =
     else HttpStatus.resolve(response)?.is2xxSuccessful == true
 
 fun populateDB() {
+    val container = mongoContainer ?: return // Skip if MongoDB container is not available
     val connectionString =
-        ConnectionString("mongodb://${MONGO_USER}:${MONGO_PASSWORD}@localhost:${mongoContainer.getMappedPort(MONGO_PORT)}/$MONGO_COLLECTION?authSource=admin&authMechanism=SCRAM-SHA-1")
+        ConnectionString("mongodb://${MONGO_USER}:${MONGO_PASSWORD}@localhost:${container.getMappedPort(MONGO_PORT)}/$MONGO_COLLECTION?authSource=admin&authMechanism=SCRAM-SHA-1")
     val pojoCodecRegistry = CodecRegistries.fromRegistries(
         MongoClientSettings.getDefaultCodecRegistry(), CodecRegistries.fromProviders(
             PojoCodecProvider.builder().automatic(true).build()

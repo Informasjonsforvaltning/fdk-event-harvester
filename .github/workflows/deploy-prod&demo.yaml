@@ -1,12 +1,13 @@
 name: Deploy to production & demo
+
 permissions:
   contents: read
   packages: write
 
-on:
-  push:
-    branches:
-      - main
+#on:
+#  push:
+#    branches:
+#      - main
 
 jobs:
   build-fdk-event-harvester:
