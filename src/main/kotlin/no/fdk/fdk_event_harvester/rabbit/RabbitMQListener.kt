@@ -25,7 +25,7 @@ class RabbitMQListener(
             dataSourceType = body.dataSourceType
         )
 
-        harvesterActivity.initiateHarvest(params, body.forceUpdate)
+        harvesterActivity.initiateHarvest(params, body.forceUpdate, body.runId)
     }
 
 }

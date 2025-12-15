@@ -26,7 +26,7 @@ class EventHarvester(
     private val applicationProperties: ApplicationProperties
 ) {
 
-    fun harvestEvents(source: HarvestDataSource, harvestDate: Calendar, forceUpdate: Boolean): HarvestReport? =
+    fun harvestEvents(source: HarvestDataSource, harvestDate: Calendar, forceUpdate: Boolean, runId: String? = null): HarvestReport? =
         if (source.id != null && source.url != null) {
 
             try {
@@ -39,6 +39,7 @@ class EventHarvester(
                             HarvestException(source.url)
                         )
                         HarvestReport(
+                            runId = runId,
                             dataSourceId = source.id,
                             dataSourceUrl = source.url,
                             id = source.id,
@@ -55,6 +56,7 @@ class EventHarvester(
                             HarvestException(source.url)
                         )
                         HarvestReport(
+                            runId = runId,
                             dataSourceId = source.id,
                             dataSourceUrl = source.url,
                             id = source.id,
@@ -67,12 +69,13 @@ class EventHarvester(
                     }
                     else -> updateIfChanged(
                         parseRDFResponse(adapter.getEvents(source), jenaWriterType),
-                        source.id, source.url, harvestDate, source.publisherId, forceUpdate
+                        source.id, source.url, harvestDate, source.publisherId, forceUpdate, runId
                     )
                 }
             } catch (ex: Exception) {
                 LOGGER.error("Harvest of ${source.url} failed", ex)
                 HarvestReport(
+                    runId = runId,
                     dataSourceId = source.id,
                     dataSourceUrl = source.url,
                     id = source.id,
@@ -89,13 +92,14 @@ class EventHarvester(
         }
 
     private fun updateIfChanged(harvested: Model, sourceId: String, sourceURL: String, harvestDate: Calendar,
-                                publisherId: String?, forceUpdate: Boolean): HarvestReport {
+                                publisherId: String?, forceUpdate: Boolean, runId: String?): HarvestReport {
         val dbData = turtleService.getHarvestSource(sourceURL)
             ?.let { safeParseRDF(it, Lang.TURTLE) }
 
         return if (!forceUpdate && dbData != null && harvested.isIsomorphicWith(dbData)) {
             LOGGER.info("No changes from last harvest of $sourceURL")
             HarvestReport(
+                runId = runId,
                 dataSourceId = sourceId,
                 dataSourceUrl = sourceURL,
                 id = sourceId,
@@ -108,12 +112,12 @@ class EventHarvester(
             LOGGER.info("Changes detected, saving data from $sourceURL, and updating FDK meta data")
             turtleService.saveAsHarvestSource(harvested, sourceURL)
 
-            updateDB(harvested, sourceId, sourceURL, harvestDate, publisherId, forceUpdate)
+            updateDB(harvested, sourceId, sourceURL, harvestDate, publisherId, forceUpdate, runId)
         }
     }
 
     private fun updateDB(harvested: Model, sourceId: String, sourceURL: String, harvestDate: Calendar,
-                         publisherId: String?, forceUpdate: Boolean): HarvestReport {
+                         publisherId: String?, forceUpdate: Boolean, runId: String?): HarvestReport {
         val allEvents = splitEventsFromRDF(harvested, sourceURL)
         val updatedEvents = updateEvents(allEvents, harvestDate, forceUpdate)
 
@@ -132,6 +136,7 @@ class EventHarvester(
             .run { eventMetaRepository.saveAll(this) }
 
         return HarvestReport(
+            runId = runId,
             dataSourceId = sourceId,
             dataSourceUrl = sourceURL,
             id = sourceId,
