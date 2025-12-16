@@ -97,8 +97,6 @@ class EventServiceTest {
             }
 
             val expectedReport = HarvestReport(
-                id = "manual-delete-$EVENT_ID_0",
-                url = EVENT_META_0.uri,
                 harvestError = false,
                 startTime = "startTime",
                 endTime = "endTime",
@@ -179,8 +177,6 @@ class EventServiceTest {
             }
 
             val expectedReport = HarvestReport(
-                id = "duplicate-delete",
-                url = "https://fellesdatakatalog.digdir.no/duplicates",
                 harvestError = false,
                 startTime = "startTime",
                 endTime = "endTime",
@@ -222,8 +218,6 @@ class EventServiceTest {
             }
 
             val expectedReport = HarvestReport(
-                id = "duplicate-delete",
-                url = "https://fellesdatakatalog.digdir.no/duplicates",
                 harvestError = false,
                 startTime = "startTime",
                 endTime = "endTime",

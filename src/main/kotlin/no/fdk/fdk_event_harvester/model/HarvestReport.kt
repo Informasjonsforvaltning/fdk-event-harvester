@@ -7,8 +7,6 @@ data class HarvestReport(
     val runId: String? = null,
     val dataSourceId: String? = null,
     val dataSourceUrl: String? = null,
-    val id: String? = null,
-    val url: String? = null,
     val dataType: String = "event",
     val harvestError: Boolean,
     val startTime: String,

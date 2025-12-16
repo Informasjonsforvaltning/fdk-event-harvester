@@ -1,6 +1,6 @@
 package no.fdk.fdk_event_harvester.utils
 
-import no.fdk.fdk_event_harvester.model.HarvestDataSource
+import no.fdk.fdk_event_harvester.model.HarvestTrigger
 import no.fdk.fdk_event_harvester.model.Organization
 import no.fdk.fdk_event_harvester.model.PrefLabel
 import org.testcontainers.shaded.com.google.common.collect.ImmutableMap
@@ -30,10 +30,11 @@ const val EVENT_ID_4 = "df191147-039c-3919-a180-acc909e55e47"
 val TEST_HARVEST_DATE: Calendar = Calendar.Builder().setTimeZone(TimeZone.getTimeZone("UTC")).setDate(2020, 9, 5).setTimeOfDay(13, 15, 39, 831).build()
 val NEW_TEST_HARVEST_DATE: Calendar = Calendar.Builder().setTimeZone(TimeZone.getTimeZone("UTC")).setDate(2020, 9, 15).setTimeOfDay(11, 52, 16, 122).build()
 
-val TEST_HARVEST_SOURCE = HarvestDataSource(
-    id = "test-source",
-    url = "http://localhost:5050/fdk-public-service-publisher.ttl",
-    acceptHeaderValue = "text/turtle",
+val TEST_HARVEST_SOURCE = HarvestTrigger(
+    runId = "run0",
+    dataSourceId = "test-source",
+    dataSourceUrl = "http://localhost:5050/fdk-public-service-publisher.ttl",
+    acceptHeader = "text/turtle",
     dataType = "publicService",
     dataSourceType = "CPSV-AP-NO",
     publisherId = "123456789"

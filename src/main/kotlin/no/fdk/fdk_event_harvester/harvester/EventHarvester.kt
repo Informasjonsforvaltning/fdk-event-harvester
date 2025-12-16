@@ -26,24 +26,22 @@ class EventHarvester(
     private val applicationProperties: ApplicationProperties
 ) {
 
-    fun harvestEvents(source: HarvestDataSource, harvestDate: Calendar, forceUpdate: Boolean, runId: String? = null): HarvestReport? =
-        if (source.id != null && source.url != null) {
+    fun harvestEvents(trigger: HarvestTrigger, harvestDate: Calendar): HarvestReport? =
+        if (trigger.runId != null && trigger.dataSourceUrl != null) {
 
             try {
-                LOGGER.debug("Starting harvest of ${source.url}")
+                LOGGER.debug("Starting harvest of ${trigger.dataSourceUrl}")
 
-                when (val jenaWriterType = jenaTypeFromAcceptHeader(source.acceptHeaderValue)) {
+                when (val jenaWriterType = jenaTypeFromAcceptHeader(trigger.acceptHeader)) {
                     null -> {
                         LOGGER.error(
-                            "Not able to harvest from ${source.url}, no accept header supplied",
-                            HarvestException(source.url)
+                            "Not able to harvest from ${trigger.dataSourceUrl}, no accept header supplied",
+                            HarvestException(trigger.dataSourceUrl)
                         )
                         HarvestReport(
-                            runId = runId,
-                            dataSourceId = source.id,
-                            dataSourceUrl = source.url,
-                            id = source.id,
-                            url = source.url,
+                            runId = trigger.runId,
+                            dataSourceId = trigger.dataSourceId,
+                            dataSourceUrl = trigger.dataSourceUrl,
                             harvestError = true,
                             errorMessage = "Not able to harvest, no accept header supplied",
                             startTime = harvestDate.formatWithOsloTimeZone(),
@@ -52,15 +50,13 @@ class EventHarvester(
                     }
                     Lang.RDFNULL -> {
                         LOGGER.error(
-                            "Not able to harvest from ${source.url}, header ${source.acceptHeaderValue} is not acceptable",
-                            HarvestException(source.url)
+                            "Not able to harvest from ${trigger.dataSourceUrl}, header ${trigger.acceptHeader} is not acceptable",
+                            HarvestException(trigger.dataSourceUrl)
                         )
                         HarvestReport(
-                            runId = runId,
-                            dataSourceId = source.id,
-                            dataSourceUrl = source.url,
-                            id = source.id,
-                            url = source.url,
+                            runId = trigger.runId,
+                            dataSourceId = trigger.dataSourceId,
+                            dataSourceUrl = trigger.dataSourceUrl,
                             harvestError = true,
                             errorMessage = "Not able to harvest, no accept header supplied",
                             startTime = harvestDate.formatWithOsloTimeZone(),
@@ -68,18 +64,16 @@ class EventHarvester(
                         )
                     }
                     else -> updateIfChanged(
-                        parseRDFResponse(adapter.getEvents(source), jenaWriterType),
-                        source.id, source.url, harvestDate, source.publisherId, forceUpdate, runId
+                        parseRDFResponse(adapter.getEvents(trigger.dataSourceUrl, trigger.acceptHeader!!), jenaWriterType),
+                        trigger.dataSourceId!!, trigger.dataSourceUrl, harvestDate, trigger.publisherId, trigger.forceUpdate, trigger.runId
                     )
                 }
             } catch (ex: Exception) {
-                LOGGER.error("Harvest of ${source.url} failed", ex)
+                LOGGER.error("Harvest of ${trigger.dataSourceUrl} failed", ex)
                 HarvestReport(
-                    runId = runId,
-                    dataSourceId = source.id,
-                    dataSourceUrl = source.url,
-                    id = source.id,
-                    url = source.url,
+                    runId = trigger.runId,
+                    dataSourceId = trigger.dataSourceId,
+                    dataSourceUrl = trigger.dataSourceUrl,
                     harvestError = true,
                     errorMessage = ex.message,
                     startTime = harvestDate.formatWithOsloTimeZone(),
@@ -102,8 +96,6 @@ class EventHarvester(
                 runId = runId,
                 dataSourceId = sourceId,
                 dataSourceUrl = sourceURL,
-                id = sourceId,
-                url = sourceURL,
                 harvestError = false,
                 startTime = harvestDate.formatWithOsloTimeZone(),
                 endTime = formatNowWithOsloTimeZone()
@@ -139,8 +131,6 @@ class EventHarvester(
             runId = runId,
             dataSourceId = sourceId,
             dataSourceUrl = sourceURL,
-            id = sourceId,
-            url = sourceURL,
             harvestError = false,
             startTime = harvestDate.formatWithOsloTimeZone(),
             endTime = formatNowWithOsloTimeZone(),
