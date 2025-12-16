@@ -29,7 +29,7 @@ open class RabbitMQConfig {
         BindingBuilder
             .bind(receiverQueue)
             .to(topicExchange)
-            .with("publicservice.*.HarvestTrigger")
+            .with("event.*.HarvestTrigger")
 
     @Bean
     open fun sendBinding(topicExchange: TopicExchange?, senderQueue: Queue?): Binding =
