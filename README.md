@@ -1,3 +1,12 @@
+⚠️ **Archived / Deprecated**
+
+> This repository is no longer maintained.
+> Its functionality has been replaced by:
+
+➡️ https://github.com/Informasjonsforvaltning/fdk-harvester
+
+---
+
 # FDK Event Harvester
 
 This application provides an API for events harvested from different sources.
